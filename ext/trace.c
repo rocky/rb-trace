@@ -8,13 +8,27 @@ VALUE rb_cTraceHook;       /* TraceHook class */
 /* FIXME: will expand to get and return an all event hooks. For now
  * though, return just the first one. */
 VALUE
-trace_s_trace_hook()
+trace_s_trace_hooks()
 {
     rb_vm_t *vm = GET_VM();
     rb_event_hook_t *hook = vm->event_hooks;
+    VALUE ary;
 
+    for (ary = rb_ary_new(); hook; hook = hook->next)
+	rb_ary_push(ary, Data_Wrap_Struct(rb_cTraceHook, NULL, NULL, hook));
+    return ary;
+}
+
+/*
+  Return the event mask value for a given hook. If no hook, then return nil.
+ */
+static VALUE
+trace_hook_proc(VALUE klass)
+{
+    rb_event_hook_t *hook;
+    Data_Get_Struct(klass, rb_event_hook_t, hook);
     if (!hook) return Qnil;
-    return Data_Wrap_Struct(rb_cTraceHook, NULL, NULL, hook);
+    return hook->data;
 }
 
 /*
@@ -53,9 +67,11 @@ Init_trace(void)
 {
     rb_cTraceHook = rb_define_class_under(rb_cRubyVM, "Trace", 
 					  rb_cObject);
-    rb_define_singleton_method(rb_cTraceHook, "trace_hook", 
-			       trace_s_trace_hook, 0);
+    rb_define_singleton_method(rb_cTraceHook, "trace_hooks", 
+			       trace_s_trace_hooks, 0);
 
+    rb_define_method(rb_cTraceHook, "proc", 
+		     trace_hook_proc, 0);
     rb_define_method(rb_cTraceHook, "event_mask", 
 		     trace_hook_event_mask, 0);
     rb_define_method(rb_cTraceHook, "event_mask=", 

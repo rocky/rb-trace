@@ -20,36 +20,42 @@ typedef struct
   rb_event_hook_t *hook;
 } hook_info_t;
 
+static int is_hook_member(rb_event_hook_t *check_hook, rb_event_hook_t *hook);
+
+static void
+check_hook_valid(rb_event_hook_t *check_hook)
+{
+  /* FIXME: in the future use check_hook to find the hook head. */
+  rb_event_hook_t *hook_head = GET_VM()->event_hooks;
+  
+  if (!is_hook_member(check_hook, hook_head))
+    rb_raise(rb_eTraceHookError, "hook not found");
+}
+
+/* Return an Array of vm event hooks found from hook. */
+VALUE
+get_trace_hooks(rb_event_hook_t *hook)
+{
+    VALUE ary;
+    for (ary = rb_ary_new(); hook; hook = hook->next)
+	rb_ary_push(ary, Data_Wrap_Struct(rb_cTraceHook, NULL, NULL, hook));
+    return ary;
+}
+
 /* Return 1 if check_hook is found in the list of hooks pointed to by
  'hook', or 0 if not found. */
 static int 
 is_hook_member(rb_event_hook_t *check_hook, rb_event_hook_t *hook) 
 {
-    for (; hook; hook = hook->next)
-      if (check_hook == hook) return 1;
+    for (; hook; hook = hook->next) if (check_hook == hook) return 1;
     return 0;  /* Not found */
 }
 
-static void
-check_hook_valid(rb_event_hook_t *check_hook, rb_event_hook_t *hook_head)
-{
-  if (!is_hook_member(check_hook, hook_head))
-    rb_raise(rb_eTraceHookError, "hook not found");
-}
-
-
-/* FIXME: will expand to get and return an all event hooks. For now
- * though, return just the first one. */
+/* Return an Array of VM event hooks objects. */
 VALUE
-trace_s_trace_hooks()
+trace_hook_s_trace_hooks()
 {
-    rb_vm_t *vm = GET_VM();
-    rb_event_hook_t *hook = vm->event_hooks;
-    VALUE ary;
-
-    for (ary = rb_ary_new(); hook; hook = hook->next)
-	rb_ary_push(ary, Data_Wrap_Struct(rb_cTraceHook, NULL, NULL, hook));
-    return ary;
+  return get_trace_hooks(GET_VM()->event_hooks);
 }
 
 /*
@@ -61,7 +67,7 @@ trace_hook_event_mask(VALUE klass)
     rb_event_hook_t *hook;
     Data_Get_Struct(klass, rb_event_hook_t, hook);
     if (!hook) return Qnil;
-    check_hook_valid(hook, GET_VM()->event_hooks);
+    check_hook_valid(hook);
     return INT2FIX(hook->flag);
 }
 
@@ -75,9 +81,10 @@ trace_hook_event_mask_set(VALUE klass, VALUE maskval)
     Data_Get_Struct(klass, rb_event_hook_t, hook);
     if (!hook) 
 	rb_raise(rb_eTraceHookError, "No hook installed");
-    else if (!FIXNUM_P(maskval)) {
+    if (!FIXNUM_P(maskval)) {
 	rb_raise(rb_eTypeError, "integer argument expected");
     } 
+    check_hook_valid(hook);
     flag = hook->flag;
     hook->flag = FIX2INT(maskval);
     return INT2FIX(flag);
@@ -92,7 +99,7 @@ trace_hook_proc(VALUE klass)
     rb_event_hook_t *hook;
     Data_Get_Struct(klass, rb_event_hook_t, hook);
     if (!hook) return Qnil;
-    check_hook_valid(hook, GET_VM()->event_hooks);
+    check_hook_valid(hook);
     return hook->data;
 }
 
@@ -113,14 +120,13 @@ trace_hook_valid(VALUE klass)
 void
 Init_trace(void)
 {
-  rb_eTraceHookError = rb_define_class_under(rb_cRubyVM,
-					     "TraceHookError", 
+  rb_eTraceHookError = rb_define_class_under(rb_cRubyVM, "TraceHookError",
 					     rb_eStandardError);
-  
-  rb_cTraceHook = rb_define_class_under(rb_cRubyVM, "TraceHook", 
-					rb_cObject);
+  rb_cTraceHook      = rb_define_class_under(rb_cRubyVM, "TraceHook", 
+					     rb_cObject);
+
   rb_define_singleton_method(rb_cTraceHook, "trace_hooks", 
-			     trace_s_trace_hooks, 0);
+			     trace_hook_s_trace_hooks, 0);
   
   rb_define_method(rb_cTraceHook, "event_mask", 
 		   trace_hook_event_mask, 0);

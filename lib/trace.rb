@@ -72,6 +72,14 @@ module Trace
   end
   module_function :events2bitmask
 
+  def bitmask2events(mask)
+    bitmask = []
+    EVENT2MASK.each do |key, value|
+      bitmask << key if (value & mask) != 0
+    end
+    return bitmask
+  end
+
   def set_trace_func_new(*args)
     if args.size > 3 or args.size < 1
       raise ArgumentError, "wrong number of arguments (#{args.size} for 1..2)"
@@ -105,7 +113,9 @@ if __FILE__ == $0
   # Demo it
   include Trace
   require 'set'
-  p events2bitmask([LINE_EVENT_MASK, CLASS_EVENT_MASK])
+  mask, unhandled = events2bitmask([LINE_EVENT_MASK, CLASS_EVENT_MASK])
+  p bitmask2events(mask)
+  p [mask, unhandled]
   p events2bitmask(Set.new([LINE_EVENT_MASK, CLASS_EVENT_MASK]))
   p events2bitmask(['LINE', 'Class'])
   p events2bitmask(Set.new(['LINE', 'Class']))

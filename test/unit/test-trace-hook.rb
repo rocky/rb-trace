@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 require 'test/unit'
 require_relative File.join(%w(.. .. ext trace))
-class TestEventHook < Test::Unit::TestCase
+
+# Testing RubyVM::TraceHook
+class TestTraceHook < Test::Unit::TestCase
 
   def setup
     set_trace_func(nil)

@@ -93,6 +93,7 @@ module Trace
     end
     event_mask
   end
+  module_function :convert_event_mask
 
   # Return a list of the global event masks in effect
   def event_masks
@@ -100,6 +101,7 @@ module Trace
       hook.event_mask
     end
   end
+  module_function :event_masks
 
   # Set event masks
   def event_masks=(mask_arg)
@@ -108,6 +110,7 @@ module Trace
       hook.event_mask = event_mask
     end
   end
+  module_function :'event_masks='
 
   # Replacement for Kernel set_trace - allows for a more liberal event mask
   def set_trace_func(*args)

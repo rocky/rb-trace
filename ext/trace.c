@@ -5,6 +5,7 @@
 
 extern VALUE rb_cRubyVM;   /* RubyVM class */
 extern rb_vm_t *ruby_current_vm;
+extern VALUE rb_obj_is_proc(VALUE proc);
 
 VALUE rb_cTraceHook;       /* TraceHook class */
 VALUE rb_eTraceHookError;  /* Exception raised by TraceHook class */
@@ -104,6 +105,24 @@ trace_hook_proc(VALUE klass)
 }
 
 /*
+  Return the event mask value for a given hook. If no hook, then return nil.
+ */
+static VALUE
+trace_hook_proc_set(VALUE klass, VALUE trace_proc)
+{
+    rb_event_hook_t *hook;
+    if (!rb_obj_is_proc(trace_proc)) {
+	rb_raise(rb_eTypeError, "trace_func needs to be Proc");
+    }
+
+    Data_Get_Struct(klass, rb_event_hook_t, hook);
+    if (!hook) return Qnil;
+    check_hook_valid(hook);
+    hook->data = trace_proc;
+    return trace_proc;
+}
+
+/*
   Return true if hook is still valid or is nil), false otherwise.
  */
 static VALUE
@@ -134,6 +153,8 @@ Init_trace(void)
 		   trace_hook_event_mask_set, 1);
   rb_define_method(rb_cTraceHook, "proc", 
 		   trace_hook_proc, 0);
+  rb_define_method(rb_cTraceHook, "proc=", 
+		   trace_hook_proc_set, 1);
   rb_define_method(rb_cTraceHook, "valid?", 
 		   trace_hook_valid, 0);
 }

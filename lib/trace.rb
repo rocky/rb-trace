@@ -1,48 +1,49 @@
 # Should be a singleton set? 
-require_relative 'tracefilter'
 
 module Trace
 
   # Event masks from <ruby.h>
-  NO_EVENT_MASK        = 0x0000
-  LINE_EVENT_MASK      = 0x0001
-  CLASS_EVENT_MASK     = 0x0002
-  END_EVENT_MASK       = 0x0004
-  CALL_EVENT_MASK      = 0x0008
-  RETURN_EVENT_MASK    = 0x0010
-  C_CALL_EVENT_MASK    = 0x0020
-  C_RETURN_EVENT_MASK  = 0x0040
-  RAISE_EVENT_MASK     = 0x0080
-  INSN_EVENT_MASK      = 0x0100
-  ALL_EVENT_MASKS      = (0xffff & ~INSN_EVENT_MASK)
-  VM_EVENT_MASK        = 0x10000
-  SWITCH_EVENT_MASK    = 0x20000
-  COVERAGE_EVENT_MASK  = 0x40000
+  unless defined?(NO_EVENT_MASK)
+    NO_EVENT_MASK        = 0x0000
+    LINE_EVENT_MASK      = 0x0001
+    CLASS_EVENT_MASK     = 0x0002
+    END_EVENT_MASK       = 0x0004
+    CALL_EVENT_MASK      = 0x0008
+    RETURN_EVENT_MASK    = 0x0010
+    C_CALL_EVENT_MASK    = 0x0020
+    C_RETURN_EVENT_MASK  = 0x0040
+    RAISE_EVENT_MASK     = 0x0080
+    INSN_EVENT_MASK      = 0x0100
+    ALL_EVENT_MASKS      = (0xffff & ~INSN_EVENT_MASK)
+    VM_EVENT_MASK        = 0x10000
+    SWITCH_EVENT_MASK    = 0x20000
+    COVERAGE_EVENT_MASK  = 0x40000
+    
+    DEFAULT_EVENT_MASK   = 
+      CALL_EVENT_MASK     |
+      CLASS_EVENT_MASK    |
+      C_CALL_EVENT_MASK   |
+      C_RETURN_EVENT_MASK |
+      END_EVENT_MASK      |
+      LINE_EVENT_MASK     |
+      RAISE_EVENT_MASK    |
+      RETURN_EVENT_MASK 
+    
+    
+    EVENT2MASK = {
+      :c_call   => C_CALL_EVENT_MASK,
+      :c_return => C_RETURN_EVENT_MASK,
+      :call     => CALL_EVENT_MASK,
+      :class    => CLASS_EVENT_MASK,
+      :end      => END_EVENT_MASK,
+      :insn     => INSN_EVENT_MASK,
+      :line     => LINE_EVENT_MASK,
+      :raise    => RAISE_EVENT_MASK,
+      :return   => RETURN_EVENT_MASK,
+    }
 
-  DEFAULT_EVENT_MASK   = 
-    CALL_EVENT_MASK     |
-    CLASS_EVENT_MASK    |
-    C_CALL_EVENT_MASK   |
-    C_RETURN_EVENT_MASK |
-    END_EVENT_MASK      |
-    LINE_EVENT_MASK     |
-    RAISE_EVENT_MASK    |
-    RETURN_EVENT_MASK 
-
-
-  EVENT2MASK = {
-    :c_call   => C_CALL_EVENT_MASK,
-    :c_return => C_RETURN_EVENT_MASK,
-    :call     => CALL_EVENT_MASK,
-    :class    => CLASS_EVENT_MASK,
-    :end      => END_EVENT_MASK,
-    :insn     => INSN_EVENT_MASK,
-    :line     => LINE_EVENT_MASK,
-    :raise    => RAISE_EVENT_MASK,
-    :return   => RETURN_EVENT_MASK,
-  }
-
-  EVENTS = EVENT2MASK.keys.sort
+    EVENTS = EVENT2MASK.keys.sort
+  end
 
   # events should be Enumerable and each element
   # should either be a Fixnum mask value or 
@@ -80,7 +81,8 @@ module Trace
     return bitmask
   end
 
-  def set_trace_func_new(*args)
+  # Replacement for Kernel set_trace - allows for a more liberal event mask
+  def set_trace_func(*args)
     if args.size > 3 or args.size < 1
       raise ArgumentError, "wrong number of arguments (#{args.size} for 1..2)"
     end
@@ -89,24 +91,24 @@ module Trace
       if args.size != 1
         raise ArgumentError, 
         "When first argument (Proc) is nil, there should be only one argument"
-      else
-        return set_trace_func(proc)
       end
-    elsif args.size == 2
-      if mask.is_a?(Fixnum)
+      return Kernel.set_trace_func(proc)
+    elsif mask_arg.nil?
+      Kernel.set_trace_func(proc)
+    else # args.size == 2
+      if mask_arg.is_a?(Fixnum)
         event_mask = mask_arg
-      elsif mask.kind_of?(Enumerable)
-        event_mask, bad_events = event2bitmask(mask_arg)
-        unless bad_events.empty?
-          raise ArgumentError,
-          "Bad set elements: #{bad_events.inspect}"
-        end
+      elsif mask_arg.kind_of?(Enumerable)
+        event_mask, bad_events = events2bitmask(mask_arg)
+        raise ArgumentError, "Bad set elements: #{bad_events.inspect}" unless
+          bad_events.empty?
+      else
+        raise ArgumentError, "Bad set mask arg: #{mask_arg}"
       end
+      Kernel.set_trace_func(proc, event_mask)
     end
-    p "proc: #{proc} event_mask: #{event_mask}"
-    # set_trace_func(proc, event_mask)
   end
-  module_function :set_trace_func_new
+  module_function :set_trace_func
 end
 
 if __FILE__ == $0
@@ -122,4 +124,14 @@ if __FILE__ == $0
   p events2bitmask([:foo, 'bar'])
   p events2bitmask(['C call', ['bar']])
   p events2bitmask(['C call', ['bar']])
+  def foo ; end
+  Trace::set_trace_func(Proc.new {|e, tf| p e}, [:call, :return])
+  foo
+  p '=' * 40
+  Trace::set_trace_func(Proc.new {|e, tf| p e})
+  foo
+  p '+' * 40
+  Trace::set_trace_func(nil)
+  foo
+  p '=' * 40
 end

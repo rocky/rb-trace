@@ -1,5 +1,6 @@
 require 'set'
 require 'thread_frame'
+require_relative 'trace'
 
 # A class that can be used to test whether certain functions should be
 # excluded.  We also convert the hook call to pass a threadframe and
@@ -13,13 +14,14 @@ class TraceFilter
     @excluded = Set.new(valid_fns)
   end
 
-  def valid_fn?(tf)
-    tf.is_a?(RubyVM::ThreadFrame) && tf.iseq
+  # fn should be a ThreadFrame or a Proc which has an instruction sequence
+  def valid_fn?(fn)
+    (fn.is_a?(RubyVM::ThreadFrame) || fn.is_a?(Proc)) && fn.iseq
   end
 
-  def <<(tf)
-    if valid_fn?(tf)
-      @excluded << tf.iseq
+  def <<(fn)
+    if valid_fn?(fn)
+      @excluded << fn
       return true
     else
       return false
@@ -31,34 +33,43 @@ class TraceFilter
     @excluded = Set.new
   end
 
-  # Return true if `tf' is in the list of functions to exclude
-  def excluded?(tf)
-    return nil unless valid_fn(tf)
-    @excluded.member?(tf)
+  # Return true if `fn' is in the list of functions to exclude
+  def excluded?(fn)
+    return nil unless valid_fn?(fn)
+    # FIXME: also check for excluded proc
+    @excluded.any? {|check_fn| check_fn.equal?(fn)}
   end
         
-  # Remove `tf' from the list of functions to include
-  def remove(tf)
-    return nil unless valid_fn(tf)
-    @excluded -= [tf]
+  # Remove `fn' from the list of functions to include
+  def remove(fn)
+    return nil unless valid_fn?(fn)
+    @excluded -= [fn]
   end
 
   # Filter based on @excluded and convert to newer style trace hook
   # call based on RubyVM::ThreadFrame.
   def trace_hook(event, file, line, id, binding, klass)
-    # FIXME: do method filtering here
     tf = RubyVM::ThreadFrame::current.prev
+    # FIXME: also check for excluded proc
+    return if excluded?(tf)
     @proc.call(event, tf)
   end
 
   # Replacement for Kernel.set_trace_func. proc should be a Proc that
   # takes two arguments, a string event, and threadframe object.
   def set_trace_func(proc, event_mask=nil)
-    raise TypeError, "trace_func needs to be Proc" unless proc.is_a?(Proc)
-    raise TypeError, "arity of proc should be 2" unless 2 == proc.arity
+    if proc.nil?
+      Kernel.set_trace_func(nil)
+      return
+    end
+    raise TypeError, 
+    "trace_func needs to be Proc or nil (is #{proc.class})" unless 
+      proc.is_a?(Proc)
+    raise TypeError, "arity of proc should be 2 (is #{proc.arity}" unless 
+      2 == proc.arity
     @proc = proc
     if event_mask
-      Kernel.set_trace_func(method(:trace_hook).to_proc, event_mask)
+      Trace::set_trace_func(method(:trace_hook).to_proc, event_mask)
     else
       Kernel.set_trace_func(method(:trace_hook).to_proc)
     end
@@ -67,4 +78,8 @@ class TraceFilter
 end
 
 if __FILE__ == $0
+  trace_filter = TraceFilter.new
+  trace_filter.set_trace_func(Proc.new {|e, tf| p e})
+  p '=' * 40
+  trace_filter.set_trace_func(nil)
 end

@@ -1,4 +1,4 @@
-# Should be a singleton set? 
+require_relative %w(.. ext trace)
 
 module Trace
 
@@ -81,6 +81,34 @@ module Trace
     return bitmask
   end
 
+  def convert_event_mask(mask_arg)
+    if mask_arg.is_a?(Fixnum)
+      event_mask = mask_arg
+    elsif mask_arg.kind_of?(Enumerable)
+      event_mask, bad_events = events2bitmask(mask_arg)
+      raise ArgumentError, "Bad set elements: #{bad_events.inspect}" unless
+        bad_events.empty?
+    else
+      raise ArgumentError, "Bad set mask arg: #{mask_arg}"
+    end
+    event_mask
+  end
+
+  # Return a list of the global event masks in effect
+  def event_masks
+    RubyVM::TraceHook::trace_hooks.map do |hook|
+      hook.event_mask
+    end
+  end
+
+  # Set event masks
+  def event_masks=(mask_arg)
+    RubyVM::TraceHook::trace_hooks.map do |hook|
+      event_mask = convert_event_mask(mask_arg)
+      hook.event_mask = event_mask
+    end
+  end
+
   # Replacement for Kernel set_trace - allows for a more liberal event mask
   def set_trace_func(*args)
     if args.size > 3 or args.size < 1
@@ -96,15 +124,7 @@ module Trace
     elsif mask_arg.nil?
       Kernel.set_trace_func(proc)
     else # args.size == 2
-      if mask_arg.is_a?(Fixnum)
-        event_mask = mask_arg
-      elsif mask_arg.kind_of?(Enumerable)
-        event_mask, bad_events = events2bitmask(mask_arg)
-        raise ArgumentError, "Bad set elements: #{bad_events.inspect}" unless
-          bad_events.empty?
-      else
-        raise ArgumentError, "Bad set mask arg: #{mask_arg}"
-      end
+      event_mask = convert_event_mask(mask_arg)
       Kernel.set_trace_func(proc, event_mask)
     end
   end
@@ -127,11 +147,19 @@ if __FILE__ == $0
   def foo ; end
   Trace::set_trace_func(Proc.new {|e, tf| p e}, [:call, :return])
   foo
+  Trace::event_masks.each { |m| print "event mask: 0x%x\n" % m }
+  Trace::event_masks = [:call]
+  p '=' * 40
+  foo
+  Trace::event_masks.each { |m| print "event mask: 0x%x\n" % m }
   p '=' * 40
   Trace::set_trace_func(Proc.new {|e, tf| p e})
+  Trace::event_masks.each { |m| print "event mask: 0x%x\n" % m }
   foo
-  p '+' * 40
   Trace::set_trace_func(nil)
+  p '=' * 40
   foo
   p '=' * 40
+  Trace::event_masks.each { |m| print "event mask: 0x%x\n" % m }
+  
 end

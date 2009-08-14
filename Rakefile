@@ -12,7 +12,7 @@ end
 
 EXT_FILES    = FileList[%w(ext/*.c ext/*.h)]
 TEST_FILES   = FileList['test/**/*.rb']
-COMMON_FILES = FileList[%w(README Rakefile)]
+COMMON_FILES = FileList[%w(Rakefile)]
 ALL_FILES    = COMMON_FILES + TEST_FILES + EXT_FILES
 
 desc 'Test units - the smaller tests'
@@ -58,3 +58,38 @@ end
 desc "Test everything - same as test."
 task :check => :test
 task :default => [:test]
+
+# Base GEM Specification
+default_spec = Gem::Specification.new do |spec|
+  spec.name = "rb-trace"
+  
+  spec.homepage = "http://github.com/rocky/rb-trace/tree/master"
+  spec.summary = "Trace hook extensions"
+  spec.description = <<-EOF
+
+rb-trace adds a trace_hook object, translates hooks bitmasks to sets
+and vice versa, and extends set_trace_func to ignore frames or
+functions.
+EOF
+
+  spec.version = PACKAGE_VERSION
+  spec.extensions = ['ext/extconf.rb']
+
+  spec.author = "R. Bernstein"
+  spec.email = "rocky@gnu.org"
+  spec.platform = Gem::Platform::RUBY
+  spec.files = ALL_FILES.to_a  
+
+  spec.required_ruby_version = '>= 1.9.1'
+  spec.date = Time.now
+  # spec.rubyforge_project = 'rocky-hacks'
+  
+  # rdoc
+  spec.has_rdoc = true
+  # spec.extra_rdoc_files = ['README', 'threadframe.rd']
+end
+
+# Rake task to build the default package
+Rake::GemPackageTask.new(default_spec) do |pkg|
+  pkg.need_tar = true
+end

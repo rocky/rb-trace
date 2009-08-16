@@ -1,4 +1,5 @@
 require 'set'
+# require '/src/external-vcs/rb-threadframe/ext/thread_frame'
 require 'thread_frame'
 require_relative 'trace'
 
@@ -16,7 +17,11 @@ class TraceFilter
 
   # fn should be a ThreadFrame or a Proc which has an instruction sequence
   def valid_fn?(fn)
-    (fn.is_a?(RubyVM::ThreadFrame) || fn.is_a?(Proc)) && fn.iseq
+    if (fn.is_a?(RubyVM::ThreadFrame) || fn.is_a?(Proc))
+      fn.respond_to?(:iseq)
+    else fn.is_a?(RubyVM::InstructionSequence)
+      true
+    end
   end
 
   def <<(fn)
@@ -37,9 +42,19 @@ class TraceFilter
   def excluded?(fn)
     return nil unless valid_fn?(fn)
     # FIXME: also check for excluded proc
-    @excluded.any? {|check_fn| check_fn.equal?(fn)}
+    retval = @excluded.any? do |check_fn| 
+      check_fn.equal?(fn)
+    end
+    # p "bool: #{retval}"
+    return retval
   end
-        
+
+  # Add the caller's instruction sequence to the list of ignored
+  # routines.
+  def ignore_me
+    @excluded << RubyVM::ThreadFrame::current.prev.iseq
+  end
+
   # Remove `fn' from the list of functions to include
   def remove(fn)
     return nil unless valid_fn?(fn)
@@ -50,8 +65,11 @@ class TraceFilter
   # call based on RubyVM::ThreadFrame.
   def trace_hook(event, file, line, id, binding, klass)
     tf = RubyVM::ThreadFrame::current.prev
-    # FIXME: also check for excluded proc
-    return if excluded?(tf)
+    tf_check = tf
+    while !tf_check.iseq do 
+      tf_check = tf_check.prev 
+    end
+    return if tf_check.nil? || excluded?(tf_check.iseq)
     @proc.call(event, tf)
   end
 
@@ -78,8 +96,30 @@ class TraceFilter
 end
 
 if __FILE__ == $0
-  trace_filter = TraceFilter.new
-  trace_filter.set_trace_func(Proc.new {|e, tf| p e})
-  p '=' * 40
+
+  def foo
+    puts "foo here\n"
+  end
+
+  def my_hook(event, tf)
+    p "#{event} #{tf.method} #{tf.source_location[0]}"
+  end
+
+  def trace_test(filter, dont_trace_me)
+    filter.ignore_me if dont_trace_me
+    filter.set_trace_func(method(:my_hook).to_proc)
+    foo
+    x = 1
+    foo
+  end
+
+  markers = '*' * 10
+  p "%s with ignore %s" % [markers, markers]
+  trace_filter.set_trace_func(nil)
+  trace_test(trace_filter, true)
+  trace_filter.set_trace_func(nil)
+  trace_filter.clear
+  p "%s without ignore (compare with above) %s" % [markers, markers]
+  trace_test(trace_filter, false)
   trace_filter.set_trace_func(nil)
 end

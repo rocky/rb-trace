@@ -8,7 +8,7 @@ class TestTraceFilter < Test::Unit::TestCase
   def setup
     $events = []
     $line_nos = []
-    @trace_filter = TraceFilter.new unless @trace_filter
+    @trace_filter = TraceFilter.new unless defined?(@trace_filter)
     @trace_filter.clear
   end
 
@@ -43,6 +43,10 @@ class TestTraceFilter < Test::Unit::TestCase
   def test_basic
     trace_test(true)
     @trace_filter.set_trace_func(nil)
+    $line_nos.each_with_index do |line_no, i|
+      puts "#{$events[i]} #{line_no}"
+    end if $DEBUG 
+
     assert_equal(false, $line_nos.empty?, 
                  'We should have gotting some trace output')
     $line_nos.each_with_index do 
@@ -58,6 +62,11 @@ class TestTraceFilter < Test::Unit::TestCase
     setup
     trace_test(false)
     @trace_filter.set_trace_func(nil)
+
+    $line_nos.each_with_index do |line_no, i|
+      puts "#{$events[i]} #{line_no}"
+    end if $DEBUG 
+
     assert_equal(true, $line_nos.size > untraced_line_nos.size,
                  'We should have traced more stuff than untraced output')
 

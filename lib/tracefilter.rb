@@ -70,6 +70,10 @@ class TraceFilter
       tf_check = tf_check.prev 
     end
     return if tf_check.nil? || excluded?(tf_check.iseq)
+    while !tf_check.iseq and tf_check.type != 'IFUNC' do 
+      tf_check = tf_check.prev 
+    end
+    return if tf_check.nil? || excluded?(tf_check.iseq)
     @proc.call(event, tf)
   end
 

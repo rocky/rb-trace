@@ -11,9 +11,10 @@ PACKAGE_VERSION = open('ext/trace.c') do |f|
 end
 
 EXT_FILES    = FileList[%w(ext/*.c ext/*.h)]
+LIB_FILES    = FileList['lib/*.rb']
 TEST_FILES   = FileList['test/**/*.rb']
 COMMON_FILES = FileList[%w(Rakefile)]
-ALL_FILES    = COMMON_FILES + TEST_FILES + EXT_FILES
+ALL_FILES    = COMMON_FILES + TEST_FILES + EXT_FILES + LIB_FILES
 
 desc 'Test units - the smaller tests'
 task :'test:unit' => [:ext] do |t|
@@ -79,6 +80,7 @@ EOF
   spec.email = "rocky@gnu.org"
   spec.platform = Gem::Platform::RUBY
   spec.files = ALL_FILES.to_a  
+  spec.add_dependency('rb-threadframe', '>= 0.2')
 
   spec.required_ruby_version = '>= 1.9.1'
   spec.date = Time.now

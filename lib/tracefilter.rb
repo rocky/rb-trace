@@ -1,7 +1,7 @@
 require 'set'
 # require '/src/external-vcs/rb-threadframe/ext/thread_frame'
 require 'thread_frame'
-require_relative 'trace'
+require_relative 'trace_mod'
 
 # A class that can be used to test whether certain functions should be
 # excluded.  We also convert the hook call to pass a threadframe and
@@ -114,6 +114,7 @@ if __FILE__ == $0
   end
 
   markers = '*' * 10
+  trace_filter = TraceFilter.new
   p "%s with ignore %s" % [markers, markers]
   trace_filter.set_trace_func(nil)
   trace_test(trace_filter, true)

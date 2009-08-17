@@ -72,6 +72,10 @@ class TestTraceFilter < Test::Unit::TestCase
     assert_equal(true, found_one, 
                  'We should have found a line number for at least one event ' +
                  'in traced output.')
+
+    assert_raises TypeError do 
+      @trace_filter.set_trace_func(method(:trace_test).to_proc)
+    end
   end
 
 end

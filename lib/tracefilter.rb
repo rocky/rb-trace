@@ -83,8 +83,8 @@ class TraceFilter
     raise TypeError, 
     "trace_func needs to be Proc or nil (is #{proc.class})" unless 
       proc.is_a?(Proc)
-    raise TypeError, "arity of proc should be 2 (is #{proc.arity}" unless 
-      2 == proc.arity
+    raise TypeError, "arity of proc should be 2 or -3 (is #{proc.arity})" unless 
+      2 == proc.arity || -3 == proc.arity
     @proc = proc
     if event_mask
       Trace::set_trace_func(method(:trace_hook).to_proc, event_mask)

@@ -80,6 +80,7 @@ module Trace
     end
     return bitmask
   end
+  module_function :bitmask2events
 
   def convert_event_mask(mask_arg)
     if mask_arg.is_a?(Fixnum)

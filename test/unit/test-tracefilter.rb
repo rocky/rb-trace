@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'test/unit'
-require_relative File.join(%w(.. .. lib tracefilter))
+require_relative %w(.. .. lib tracefilter)
 
 # Testing Trace Filter class
 class TestTraceFilter < Test::Unit::TestCase

@@ -3,77 +3,62 @@ require 'set'
 require 'thread_frame'
 require_relative 'trace_mod'
 
-# A class that can be used to test whether certain functions should be
+# A class that can be used to test whether certain methods should be
 # excluded.  We also convert the hook call to pass a threadframe and
 # an event rather than event and those other 5 parameters.
 class TraceFilter
 
   attr_reader :excluded
 
-  def initialize(excluded_fns = [])
-    valid_fns = excluded_fns.select{|fn| valid_fn?(fn)}
-    @excluded = Set.new(valid_fns)
+  def initialize(excluded_meths = [])
+    excluded_meths = excluded_meths.select{|fn| valid_meth?(fn)}
+    @excluded = Set.new(excluded_meths)
   end
 
   # fn should be a ThreadFrame or a Proc which has an instruction sequence
-  def valid_fn?(fn)
-    if (fn.is_a?(RubyVM::ThreadFrame) || fn.is_a?(Proc))
-      fn.respond_to?(:iseq)
-    else fn.is_a?(RubyVM::InstructionSequence)
-      true
-    end
+  def valid_meth?(fn)
+    fn.is_a?(Method)
   end
 
-  def <<(fn)
-    if valid_fn?(fn)
-      @excluded << fn
+  def <<(meth)
+    if valid_meth?(meth)
+      @excluded << meth
       return true
     else
       return false
     end
   end
 
-  # Null out list of excluded fns
+  # Null out list of excluded methods
   def clear
     @excluded = Set.new
   end
 
-  # Return true if `fn' is in the list of functions to exclude
-  def excluded?(fn)
-    return nil unless valid_fn?(fn)
-    # FIXME: also check for excluded proc
-    retval = @excluded.any? do |check_fn| 
-      check_fn.equal?(fn)
-    end
-    # p "bool: #{retval}"
-    return retval
-  end
-
-  # Add the caller's instruction sequence to the list of ignored
-  # routines.
-  def ignore_me
-    @excluded << RubyVM::ThreadFrame::current.prev.iseq
-  end
-
-  # Remove `fn' from the list of functions to include
-  def remove(fn)
-    return nil unless valid_fn?(fn)
-    @excluded -= [fn]
+  # Remove `meth' from the list of functions to include
+  def remove(meth)
+    return nil unless valid_meth?(meth)
+    @excluded -= [meth]
   end
 
   # Filter based on @excluded and convert to newer style trace hook
   # call based on RubyVM::ThreadFrame.
   def trace_hook(event, file, line, id, binding, klass)
     tf = RubyVM::ThreadFrame::current.prev
+
+    # FIXME: Clean this mess up. And while your at it, understand
+    # what's going on better.
     tf_check = tf
-    while !tf_check.iseq do 
+    while tf_check.method == "IFUNC" do 
       tf_check = tf_check.prev 
     end
-    return if tf_check.nil? || excluded?(tf_check.iseq)
-    while !tf_check.iseq and tf_check.type != 'IFUNC' do 
-      tf_check = tf_check.prev 
+    return unless tf_check
+    begin 
+      meth = eval("self.method(:#{tf_check.method})", tf_check.binding)
+    rescue
+    rescue SyntaxError
+      return
     end
-    return if tf_check.nil? || excluded?(tf_check.iseq)
+    return if @excluded.member?(meth)
     @proc.call(event, tf)
   end
 
@@ -101,30 +86,57 @@ end
 
 if __FILE__ == $0
 
-  def foo
-    puts "foo here\n"
+  def square(x)
+    y = x * x
+    puts "the square of #{x} is #{y}\n"
+    y
   end
 
   def my_hook(event, tf)
-    p "#{event} #{tf.method} #{tf.source_location[0]}"
+    @events << event
+    @line_nos << tf.source_location[0]
   end
 
-  def trace_test(filter, dont_trace_me)
-    filter.ignore_me if dont_trace_me
-    filter.set_trace_func(method(:my_hook).to_proc)
-    foo
-    x = 1
-    foo
+  def trace_test(dont_trace_me)
+    @start_line = __LINE__
+    @trace_filter.excluded << self.method(:trace_test) if dont_trace_me
+
+    # Start tracing.
+    @trace_filter.set_trace_func(method(:my_hook).to_proc)
+    square(10)
+    x = 100
+    square(x)
+    @end_line = __LINE__
   end
 
-  markers = '*' * 10
-  trace_filter = TraceFilter.new
-  p "%s with ignore %s" % [markers, markers]
-  trace_filter.set_trace_func(nil)
-  trace_test(trace_filter, true)
-  trace_filter.set_trace_func(nil)
-  trace_filter.clear
-  p "%s without ignore (compare with above) %s" % [markers, markers]
-  trace_test(trace_filter, false)
-  trace_filter.set_trace_func(nil)
+  def setup
+    @events   = []
+    @line_nos = []
+    @trace_filter.clear
+  end
+
+  def print_trace
+    @line_nos.each_with_index do |line_no, i|
+      print "%2d %s %s\n" % [i, @events[i], line_no]
+    end
+  end
+
+  @trace_filter = TraceFilter.new
+  markers       = '*' * 10
+
+  [[false, 'out'], [true, '']].each do |arg, suffix|
+    setup 
+    puts "%s with%s ignore %s" % [markers, suffix, markers]
+    trace_test(arg)
+    @trace_filter.set_trace_func(nil)
+    print_trace
+  end
+
+  @line_nos.each_with_index do 
+    |line_no, i|
+    if (@start_line..@end_line).member?(line_no)
+      puts "We should not have found a line number in #{@start_line}..#{@end_line}." 
+      puts "Got line number #{line_no} at index #{i}, event #{@events[i]}"
+    end
+  end
 end

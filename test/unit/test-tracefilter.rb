@@ -24,13 +24,13 @@ class TestTraceFilter < Test::Unit::TestCase
 
   # Save stuff from the trace for inspection later.
   def my_hook(event, tf)
-    $events << event
+    $events   << event
     $line_nos << tf.source_location[0]
   end
 
   def trace_test(dont_trace_me)
     $start_line = __LINE__
-    @trace_filter.ignore_me if dont_trace_me
+    @trace_filter.excluded << self.method(:trace_test) if dont_trace_me
 
     # Start tracing.
     @trace_filter.set_trace_func(method(:my_hook).to_proc)
@@ -40,12 +40,16 @@ class TestTraceFilter < Test::Unit::TestCase
     $end_line = __LINE__
   end
 
+  def print_trace
+    @line_nos.each_with_index do |line_no, i|
+      print "%2d %s %s\n" % [i, $events[i], line_no]
+    end
+  end
+
   def test_basic
     trace_test(true)
     @trace_filter.set_trace_func(nil)
-    $line_nos.each_with_index do |line_no, i|
-      puts "#{$events[i]} #{line_no}"
-    end if $DEBUG 
+    print_trace if $DEBUG
 
     assert_equal(false, $line_nos.empty?, 
                  'We should have gotting some trace output')
@@ -59,13 +63,11 @@ class TestTraceFilter < Test::Unit::TestCase
     end
     untraced_line_nos = $line_nos
     untrace_events = $events
+
     setup
     trace_test(false)
     @trace_filter.set_trace_func(nil)
-
-    $line_nos.each_with_index do |line_no, i|
-      puts "#{$events[i]} #{line_no}"
-    end if $DEBUG 
+    print_trace if $DEBUG
 
     assert_equal(true, $line_nos.size > untraced_line_nos.size,
                  'We should have traced more stuff than untraced output')
@@ -83,7 +85,7 @@ class TestTraceFilter < Test::Unit::TestCase
                  'in traced output.')
 
     assert_raises TypeError do 
-      @trace_filter.set_trace_func(method(:trace_test).to_proc)
+      @trace_filter.set_trace_func(method(:trace_test))
     end
   end
 

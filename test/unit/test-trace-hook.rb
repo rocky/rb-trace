@@ -76,22 +76,20 @@ class TestTraceHook < Test::Unit::TestCase
       tt[0].proc = 6
     end
 
-  # Test valid?
-  def test_valid
-    tt = RubyVM::TraceHook::trace_hooks
-    assert_equal(true, tt[0].valid?)
-    set_trace_func(Proc.new {} )
-    tt = RubyVM::TraceHook::trace_hooks
-    assert_equal(true, tt[0].valid?)
-    set_trace_func(Proc.new { 1 } )
-    assert_equal(false, tt[0].valid?)
-    tt = RubyVM::TraceHook::trace_hooks
-    assert_equal(true, tt[0].valid?)
-    set_trace_func(nil)
-    assert_equal(false, tt[0].valid?)
+    # Test valid?
+    def test_valid
+      tt = RubyVM::TraceHook::trace_hooks
+      assert_equal(true, tt[0].valid?)
+      set_trace_func(Proc.new {} )
+      tt = RubyVM::TraceHook::trace_hooks
+      assert_equal(true, tt[0].valid?)
+      set_trace_func(Proc.new { 1 } )
+      assert_equal(false, tt[0].valid?)
+      tt = RubyVM::TraceHook::trace_hooks
+      assert_equal(true, tt[0].valid?)
+      set_trace_func(nil)
+      GC.start
+      assert_equal(false, tt[0].valid?)
+    end
   end
-
-    
-  end
-
 end

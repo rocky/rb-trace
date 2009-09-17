@@ -30,7 +30,7 @@ class TestTraceFilter < Test::Unit::TestCase
 
   def trace_test(dont_trace_me)
     $start_line = __LINE__
-    @trace_filter.excluded << self.method(:trace_test) if dont_trace_me
+    @trace_filter << self.method(:trace_test) if dont_trace_me
 
     # Start tracing.
     @trace_filter.set_trace_func(method(:my_hook).to_proc)

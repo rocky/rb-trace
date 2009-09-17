@@ -12,7 +12,8 @@ class TraceFilter
 
   def initialize(excluded_meths = [])
     excluded_meths = excluded_meths.select{|fn| valid_meth?(fn)}
-    @excluded = Set.new(excluded_meths)
+    @excluded = Set.new(excluded_meths.map{|m| m.to_s})
+    
   end
 
   # fn should be a ThreadFrame or a Proc which has an instruction sequence
@@ -22,7 +23,7 @@ class TraceFilter
 
   def <<(meth)
     if valid_meth?(meth)
-      @excluded << meth
+      @excluded << meth.to_s
       return true
     else
       return false
@@ -37,7 +38,7 @@ class TraceFilter
   # Remove `meth' from the list of functions to include
   def remove(meth)
     return nil unless valid_meth?(meth)
-    @excluded -= [meth]
+    @excluded -= [meth.to_s]
   end
 
   # Filter based on @excluded and convert to newer style trace hook
@@ -53,13 +54,14 @@ class TraceFilter
     end
     return unless tf_check
     begin 
-      meth = eval("self.method(:#{tf_check.method})", tf_check.binding)
-    rescue
+      meth = eval("self.method(:#{tf_check.method})", tf_check.binding).to_s
+      if @excluded.member?(meth)
+        return 
+      end
     rescue SyntaxError
-      return
+      tf_check = tf
     end
-    return if @excluded.member?(meth)
-    @proc.call(event, tf)
+    @proc.call(event, tf_check)
   end
 
   # Replacement for Kernel.set_trace_func. proc should be a Proc that
@@ -94,12 +96,12 @@ if __FILE__ == $0
 
   def my_hook(event, tf)
     @events << event
-    @line_nos << tf.source_location[0]
+    @line_nos << ((tf.source_location) ? tf.source_location[0] : '?')
   end
 
   def trace_test(dont_trace_me)
     @start_line = __LINE__
-    @trace_filter.excluded << self.method(:trace_test) if dont_trace_me
+    @trace_filter << self.method(:trace_test) if dont_trace_me
 
     # Start tracing.
     @trace_filter.set_trace_func(method(:my_hook).to_proc)

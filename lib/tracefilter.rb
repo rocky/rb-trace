@@ -49,16 +49,20 @@ class TraceFilter
     # FIXME: Clean this mess up. And while your at it, understand
     # what's going on better.
     tf_check = tf
-    while tf_check.method == "IFUNC" do 
+    while %w(IFUNC BLOCK).member?(tf_check.type) do 
       tf_check = tf_check.prev 
     end
     return unless tf_check
     begin 
-      meth = eval("self.method(:#{tf_check.method})", tf_check.binding).to_s
-      if @excluded.member?(meth)
-        return 
+      if tf_check.method && !tf_check.method.empty?
+        meth_name = tf_check.method.gsub(/^.* in /, '')
+        meth = eval("self.method(:#{meth_name})", tf_check.binding).to_s
+        if @excluded.member?(meth)
+          return 
+        end
       end
     rescue SyntaxError
+    rescue ArgumentError
       tf_check = tf
     end
     @proc.call(event, tf_check)

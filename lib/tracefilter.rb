@@ -49,7 +49,7 @@ class TraceFilter
     # FIXME: Clean this mess up. And while your at it, understand
     # what's going on better.
     tf_check = tf
-    while %w(IFUNC BLOCK).member?(tf_check.type) do 
+    while %w(BLOCK IFUNC CFUNC).member?(tf_check.type) do 
       tf_check = tf_check.prev 
     end
     return unless tf_check
@@ -61,6 +61,7 @@ class TraceFilter
           return 
         end
       end
+    rescue NameError
     rescue SyntaxError
     rescue ArgumentError
       tf_check = tf

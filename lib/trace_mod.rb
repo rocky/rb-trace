@@ -35,11 +35,14 @@ module Trace
       :c_return => C_RETURN_EVENT_MASK,
       :call     => CALL_EVENT_MASK,
       :class    => CLASS_EVENT_MASK,
+      :coverage => COVERAGE_EVENT_MASK,
       :end      => END_EVENT_MASK,
       :insn     => INSN_EVENT_MASK,
       :line     => LINE_EVENT_MASK,
       :raise    => RAISE_EVENT_MASK,
       :return   => RETURN_EVENT_MASK,
+      :switch   => SWITCH_EVENT_MASK,
+      :vm       => VM_EVENT_MASK
     }
 
     EVENTS = EVENT2MASK.keys.sort

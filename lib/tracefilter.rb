@@ -64,9 +64,8 @@ class TraceFilter
     rescue NameError
     rescue SyntaxError
     rescue ArgumentError
-      tf_check = tf
     end
-    @proc.call(event, tf_check)
+    @proc.call(event, tf)
   end
 
   # Replacement for Kernel.set_trace_func. proc should be a Proc that

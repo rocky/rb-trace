@@ -14,12 +14,14 @@ module Trace
     C_RETURN_EVENT_MASK  = 0x0040
     RAISE_EVENT_MASK     = 0x0080
     INSN_EVENT_MASK      = 0x0100
+    BRKPT_EVENT_MASK     = 0x0200
     ALL_EVENT_MASKS      = (0xffff & ~INSN_EVENT_MASK)
     VM_EVENT_MASK        = 0x10000
     SWITCH_EVENT_MASK    = 0x20000
     COVERAGE_EVENT_MASK  = 0x40000
     
     DEFAULT_EVENT_MASK   = 
+      BRKPT_EVENT_MASK    |
       CALL_EVENT_MASK     |
       CLASS_EVENT_MASK    |
       C_CALL_EVENT_MASK   |
@@ -31,6 +33,7 @@ module Trace
     
     
     EVENT2MASK = {
+      :brkpt    => BRKPT_EVENT_MASK,
       :c_call   => C_CALL_EVENT_MASK,
       :c_return => C_RETURN_EVENT_MASK,
       :call     => CALL_EVENT_MASK,

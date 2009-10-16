@@ -12,6 +12,11 @@ class TestEvent2Bitmask < Test::Unit::TestCase
     assert_equal(test_pair, 
                  events2bitmask(Set.new([LINE_EVENT_MASK, CLASS_EVENT_MASK])))
     assert_equal([:class, :line], bitmask2events(test_mask))
+
+    EVENT2MASK.each do |mask_name, bit_value|
+      assert_equal([mask_name], bitmask2events(bit_value))
+    end
+
     assert_equal(test_pair, events2bitmask(['LINE', 'Class']))
     assert_equal(test_pair, events2bitmask(Set.new(['LINE', 'Class'])))
     [[:foo, 'bar'], ['C call', ['bar']]].each do |bad|

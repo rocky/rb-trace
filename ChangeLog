@@ -1,0 +1,135 @@
+2009-10-16  R. Bernstein <rocky@gnu.org>
+
+	* lib/trace_mod.rb, test/unit/test-event2bitmask.rb: Add breakpoint
+	event.
+
+2009-10-11  rocky <rocky@ubuntu-vm.(none)>
+
+	* lib/tracefilter.rb: Pass the original frame seen, not the
+	filtered/checked frame.
+
+2009-09-27  rocky <rockyb@rubyforge.org>
+
+	* lib/trace_mod.rb: Add event names for all events; add coverage, vm
+	and switch.
+
+2009-09-19  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb: In entering a class the method name can come
+	back "CLASS" and this is not a valid method. NameError is returned
+	here.
+
+2009-09-17  rockyb <rocky@gnu.org>
+
+	* lib/tracefilter.rb: Back up for BLOCKS as well as CFUNCS. Funky
+	method name and C function method name avoidance (for now)
+
+2009-09-16  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Have to back
+	off and use string method.to_ instead of method in sets, because we
+	can't control or figure out how to get method equality with
+	RubyVM::ThreadFrame.current.method.
+
+2009-08-18  R. Bernstein <rocky@gnu.org>
+
+	* test/unit/test-event2bitmask.rb, test/unit/test-trace-hook.rb,
+	test/unit/test-trace_mod.rb, test/unit/test-tracefilter.rb: Remove
+	File.join from File.join. It takes an Array!
+
+2009-08-18  rocky <rockyb@rubyforge.org>
+
+	* lib/trace_mod.rb: Expose bitmask2events.
+
+2009-08-17  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, test/unit/test-trace-hook.rb,
+	test/unit/test-tracefilter.rb: Exclude only on methods for now.
+	Something is funky with GC and saving excluded instruction
+	sequences.
+
+2009-08-17  rockyb <rocky@gnu.org>
+
+	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Walk back IFUNC
+	frames for ignored.
+
+2009-08-17  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Arity of trace
+	hook can be 2 or -3.
+
+2009-08-16  rocky <rockyb@rubyforge.org>
+
+	* Rakefile, lib/trace.rb, lib/trace_mod.rb, lib/tracefilter.rb,
+	test/unit/test-event2bitmask.rb, test/unit/test-trace.rb,
+	test/unit/test-trace_mod.rb: Fix Rakefile to make the package
+	correctly. Add dependency on rb-threadframe and make sure
+	TraceFilter gets loaded.
+
+2009-08-16  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Add instruction
+	sequence filtering, and convenience method to skip "this one". Test
+	all of this.
+
+2009-08-14  rockyb <rocky@gnu.org>
+
+	* lib/trace.rb, test/unit/test-trace-hook.rb,
+	test/unit/test-trace.rb: Start testing set_trace_func and
+	setting/getting trace_func masks.
+
+2009-08-14  R. Bernstein <rocky@gnu.org>
+
+	* lib/trace.rb: Add accessors from Tracer module to set and access
+	trace-event masks.
+
+2009-08-14  R. Bernstein <rocky@gnu.org>
+
+	* lib/trace.rb, lib/tracefilter.rb: A more complete trace and
+	tracefilter. Seems to a big in set_trace(nil).
+
+2009-08-14  rocky <rockyb@rubyforge.org>
+
+	* .gitignore, Rakefile: Add tasks to build gem.
+
+2009-08-13  rocky <rockyb@rubyforge.org>
+
+	* lib/.gitignore, lib/tracefilter.rb: Fill out more of trace
+	filtering. Much more work is still needed.
+
+2009-08-13  rocky <rockyb@rubyforge.org>
+
+	* ext/trace.c, test/unit/test-trace-hook.rb: Add
+	RubyVM::TraceHook.proc= . More tests and better organized.
+
+2009-08-13  R. Bernstein <rocky@gnu.org>
+
+	* ext/trace.c: Code cleanup. Found another access we should first
+	check for validity.
+
+2009-08-13  R. Bernstein <rocky@gnu.org>
+
+	* Rakefile, ext/trace.c, test/unit/test-trace-hook.rb: ext/trace.c:
+	Check trace hook validity before accessing fields. Add valid?
+	method. Add  RubyVM::TraceHookError exception class.
+	test-trace-hook.rb: test the modifications to ext/trace.c Rakefile:
+	More complete. Add "ext", "clean" and "check". test/check depends on
+	"ext".
+
+2009-08-13  rocky <rockyb@rubyforge.org>
+
+	* ext/trace.c, test/unit/test-trace-hook.rb: Add access to all
+	global trace hooks as an array. Add ccess to proc of a trace hook.
+
+2009-08-12  rocky <rockyb@rubyforge.org>
+
+	* ext/.gitignore, ext/extconf.rb, ext/thread_pthread.h,
+	ext/trace.c, ext/vm_core_mini.h, lib/trace.rb,
+	test/unit/test-event2bitmask.rb, test/unit/test-trace-hook.rb: 
+	Create an event hook object. Be able to get and the set event mask
+	for it.
+
+2009-08-11  rocky <rocky@sanchez.(none)>
+
+	* Trace hook enhancements.
+

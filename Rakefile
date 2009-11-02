@@ -16,6 +16,11 @@ TEST_FILES   = FileList['test/**/*.rb']
 COMMON_FILES = FileList[%w(Rakefile)]
 ALL_FILES    = COMMON_FILES + TEST_FILES + EXT_FILES + LIB_FILES
 
+desc "Create a GNU-style ChangeLog via git2cl"
+task :ChangeLog do
+  system("git log --pretty --numstat --summary | git2cl > ChangeLog")
+end
+
 desc 'Test units - the smaller tests'
 task :'test:unit' => [:ext] do |t|
   Rake::TestTask.new(:'test:unit') do |t|

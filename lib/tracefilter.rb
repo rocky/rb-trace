@@ -65,6 +65,9 @@ class TraceFilter
     rescue SyntaxError
     rescue ArgumentError
     end
+    while %w(IFUNC).member?(tf.type) do 
+      tf = tf.prev 
+    end
     @proc.call(event, tf)
   end
 

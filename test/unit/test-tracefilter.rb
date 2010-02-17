@@ -25,7 +25,7 @@ class TestTraceFilter < Test::Unit::TestCase
   # Save stuff from the trace for inspection later.
   def my_hook(event, tf)
     $events   << event
-    $line_nos << tf.source_location[0]
+    $line_nos << tf.source_location[0] if tf.source_location
   end
 
   def trace_test(dont_trace_me)
@@ -41,7 +41,7 @@ class TestTraceFilter < Test::Unit::TestCase
   end
 
   def print_trace
-    @line_nos.each_with_index do |line_no, i|
+    $line_nos.each_with_index do |line_no, i|
       print "%2d %s %s\n" % [i, $events[i], line_no]
     end
   end
@@ -51,7 +51,7 @@ class TestTraceFilter < Test::Unit::TestCase
     @trace_filter.set_trace_func(nil)
     print_trace if $DEBUG
 
-    assert_equal(false, $line_nos.empty?, 
+    assert_equal(false, $events.empty?, 
                  'We should have gotting some trace output')
     $line_nos.each_with_index do 
       |line_no, i|

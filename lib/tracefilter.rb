@@ -49,6 +49,7 @@ class TraceFilter
     # FIXME: Clean this mess up. And while your at it, understand
     # what's going on better.
     tf_check = tf
+
     while %w(BLOCK IFUNC CFUNC).member?(tf_check.type) do 
       tf_check = tf_check.prev 
     end
@@ -68,7 +69,18 @@ class TraceFilter
     while %w(IFUNC).member?(tf.type) do 
       tf = tf.prev 
     end
-    @proc.call(event, tf)
+
+    # There is what looks like a a bug in Ruby where self.class for C
+    # functions are not set correctly. Until this is fixed in what I
+    # consider a more proper way, we'll hack around this by passing
+    # the binding as the optional arg parameter.
+    arg = 
+      if 'CFUNC' == tf.type && NilClass != klass 
+        klass 
+      else nil
+      end
+
+    @proc.call(event, tf, arg)
   end
 
   # Replacement for Kernel.set_trace_func. proc should be a Proc that

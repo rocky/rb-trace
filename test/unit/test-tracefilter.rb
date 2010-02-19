@@ -6,13 +6,15 @@ require_relative %w(.. .. lib tracefilter)
 class TestTraceFilter < Test::Unit::TestCase
 
   def setup
-    $events = []
+    $args     = []
+    $events   = []
     $line_nos = []
     @trace_filter = TraceFilter.new unless defined?(@trace_filter)
     @trace_filter.clear
   end
 
   def teardown
+    $args   = []
     $events = []
     $line_nos = []
   end
@@ -23,7 +25,8 @@ class TestTraceFilter < Test::Unit::TestCase
   end
 
   # Save stuff from the trace for inspection later.
-  def my_hook(event, tf)
+  def my_hook(event, tf, arg=nil)
+    $args     << arg if arg
     $events   << event
     $line_nos << tf.source_location[0] if tf.source_location
   end
@@ -44,6 +47,7 @@ class TestTraceFilter < Test::Unit::TestCase
     $line_nos.each_with_index do |line_no, i|
       print "%2d %s %s\n" % [i, $events[i], line_no]
     end
+    p $args
   end
 
   def test_basic
@@ -53,6 +57,11 @@ class TestTraceFilter < Test::Unit::TestCase
 
     assert_equal(false, $events.empty?, 
                  'We should have gotting some trace output')
+    assert_equal([Kernel, Kernel], $args,
+                 'C call/returns set $args')
+    assert_equal(0, $args.size % 2, 
+                 'Should have equal number of C calls and returns')
+
     $line_nos.each_with_index do 
       |line_no, i|
       assert_equal(false, ($start_line..$end_line).member?(line_no),

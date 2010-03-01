@@ -66,7 +66,7 @@ task :check => :test
 task :default => [:test]
 
 # Base GEM Specification
-default_spec = Gem::Specification.new do |spec|
+spec = Gem::Specification.new do |spec|
   spec.name = "rb-trace"
   
   spec.homepage = "http://github.com/rocky/rb-trace/tree/master"
@@ -97,6 +97,13 @@ EOF
 end
 
 # Rake task to build the default package
-Rake::GemPackageTask.new(default_spec) do |pkg|
+Rake::GemPackageTask.new(spec) do |pkg|
   pkg.need_tar = true
 end
+
+desc 'Install locally'
+task :install => :package do
+  Dir.chdir(File::dirname(__FILE__)) do
+    system('gem', 'install', "pkg/#{spec.name}-#{spec.version}.gem")
+  end
+end    

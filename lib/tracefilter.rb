@@ -35,6 +35,14 @@ class TraceFilter
     @excluded = Set.new
   end
 
+  def member?(meth)
+    if valid_meth?(meth)
+      @excluded.member?(meth.to_s)
+    else
+      false
+    end
+  end
+
   # Remove `meth' from the list of functions to include
   def remove(meth)
     return nil unless valid_meth?(meth)
@@ -106,6 +114,7 @@ class TraceFilter
 end
 
 if __FILE__ == $0
+  include Trace
 
   def square(x)
     y = x * x
@@ -113,7 +122,8 @@ if __FILE__ == $0
     y
   end
 
-  def my_hook(event, tf)
+  def my_hook(event, tf, arg=nil)
+    p event
     @events << event
     @line_nos << ((tf.source_location) ? tf.source_location[0] : '?')
   end
@@ -121,9 +131,11 @@ if __FILE__ == $0
   def trace_test(dont_trace_me)
     @start_line = __LINE__
     @trace_filter << self.method(:trace_test) if dont_trace_me
+    p @trace_filter.member?(self.method(:trace_test))
 
     # Start tracing.
-    @trace_filter.set_trace_func(method(:my_hook).to_proc)
+    event_mask = DEFAULT_EVENT_MASK & ~(C_RETURN_EVENT_MASK | RETURN_EVENT_MASK)
+    @trace_filter.set_trace_func(method(:my_hook).to_proc, event_mask)
     square(10)
     x = 100
     square(x)

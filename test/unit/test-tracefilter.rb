@@ -60,10 +60,8 @@ class TestTraceFilter < Test::Unit::TestCase
 
     assert_equal(false, $events.empty?, 
                  'We should have gotting some trace output')
-    assert_equal([Kernel, Kernel], $args,
+    assert_equal([Kernel], $args,
                  'C call/returns set $args')
-    assert_equal(0, $args.size % 2, 
-                 'Should have equal number of C calls and returns')
 
     $line_nos.each_with_index do 
       |line_no, i|

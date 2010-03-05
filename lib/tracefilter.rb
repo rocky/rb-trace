@@ -123,7 +123,7 @@ if __FILE__ == $0
   end
 
   def my_hook(event, tf, arg=nil)
-    p event
+    puts "#{event} #{tf.source_container[1]} #{tf.source_location[0]}"
     @events << event
     @line_nos << ((tf.source_location) ? tf.source_location[0] : '?')
   end
@@ -134,7 +134,7 @@ if __FILE__ == $0
     p @trace_filter.member?(self.method(:trace_test))
 
     # Start tracing.
-    event_mask = DEFAULT_EVENT_MASK & ~(C_RETURN_EVENT_MASK | RETURN_EVENT_MASK)
+    event_mask = DEFAULT_EVENT_MASK # & ~(C_RETURN_EVENT_MASK | RETURN_EVENT_MASK)
     @trace_filter.set_trace_func(method(:my_hook).to_proc, event_mask)
     square(10)
     x = 100

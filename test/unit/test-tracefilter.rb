@@ -99,4 +99,17 @@ class TestTraceFilter < Test::Unit::TestCase
     end
   end
 
+  # Save stuff from the trace for inspection later.
+  def raise_hook(event, tf, arg=nil)
+    return unless 'raise' == event
+    $args     << arg.to_s
+  end
+
+  def test_raise_sets_errmsg
+    @trace_filter.set_trace_func(method(:raise_hook).to_proc)
+    1/0 rescue nil
+    @trace_filter.set_trace_func(nil)
+    assert_equal(['divided by 0'], $args)
+  end
+
 end

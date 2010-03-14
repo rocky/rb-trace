@@ -85,7 +85,13 @@ class TraceFilter
     arg = 
       if 'CFUNC' == tf.type && NilClass != klass 
         klass 
-      else nil
+      elsif 'raise' == event
+        # As a horrible hack to be able to get the raise message on a
+        # 'raise' event before the event occurs, I changed RubyVM to store
+        # the message in the class field.
+        klass
+      else
+        nil
       end
 
     @proc.call(event, tf, arg)

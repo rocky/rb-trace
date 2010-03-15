@@ -60,10 +60,8 @@ class TestTraceFilter < Test::Unit::TestCase
 
     assert_equal(false, $events.empty?, 
                  'We should have gotting some trace output')
-    assert_equal([Kernel, Kernel], $args,
+    assert_equal([Kernel], $args,
                  'C call/returns set $args')
-    assert_equal(0, $args.size % 2, 
-                 'Should have equal number of C calls and returns')
 
     $line_nos.each_with_index do 
       |line_no, i|
@@ -99,6 +97,19 @@ class TestTraceFilter < Test::Unit::TestCase
     assert_raises TypeError do 
       @trace_filter.set_trace_func(method(:trace_test))
     end
+  end
+
+  # Save stuff from the trace for inspection later.
+  def raise_hook(event, tf, arg=nil)
+    return unless 'raise' == event
+    $args     << arg.to_s
+  end
+
+  def test_raise_sets_errmsg
+    @trace_filter.set_trace_func(method(:raise_hook).to_proc)
+    1/0 rescue nil
+    @trace_filter.set_trace_func(nil)
+    assert_equal(['divided by 0'], $args)
   end
 
 end

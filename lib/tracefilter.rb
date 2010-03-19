@@ -96,7 +96,6 @@ class TraceFilter
 
     retval = @proc.call(event, tf, arg)
     if retval.respond_to?(:ancestors) && retval.ancestors.include?(Exception)
-      puts 'exception returned'
       raise retval 
     end
   end

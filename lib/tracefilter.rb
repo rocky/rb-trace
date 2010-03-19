@@ -94,7 +94,11 @@ class TraceFilter
         nil
       end
 
-    @proc.call(event, tf, arg)
+    retval = @proc.call(event, tf, arg)
+    if retval.respond_to?(:ancestors) && retval.ancestors.include?(Exception)
+      puts 'exception returned'
+      raise retval 
+    end
   end
 
   # Replacement for Kernel.set_trace_func. proc should be a Proc that

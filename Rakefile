@@ -118,3 +118,4 @@ end
 task :install_full => :package do
   Dir.chdir(File::dirname(__FILE__)) do
     install(spec)
+end

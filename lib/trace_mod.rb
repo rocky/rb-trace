@@ -1,5 +1,8 @@
 require_relative %w(.. ext trace)
 
+# A module for interfacing with Kernel::set_trace which adds
+# filtering of events inside Ruby (as opposed to inside your trace
+# hook which is slower).
 module Trace
 
   # Event masks from <ruby.h>
@@ -51,11 +54,11 @@ module Trace
     EVENTS = EVENT2MASK.keys.sort
   end
 
-  # events should be Enumerable and each element
-  # should either be a Fixnum mask value or 
-  # something that can be converted to a symbol. If the
-  # latter, the case is not important as we'll downcase
-  # the string representation.
+  # Convert +events+ into a Fixnum bitmask used internally by Ruby.
+  # Parameter +events+ should be Enumerable and each element should
+  # either be a Fixnum mask value or something that can be converted
+  # to a symbol. If the latter, the case is not important as we'll
+  # downcase the string representation.
   def events2bitmask(events)
     bitmask = NO_EVENT_MASK
     bad_events = []
@@ -79,12 +82,14 @@ module Trace
   end
   module_function :events2bitmask
 
-  def bitmask2events(mask)
-    bitmask = []
+  # Convert Fixnum +bitmask+ used internally by Ruby, into an Array of
+  # event names.
+  def bitmask2events(bitmask)
+    mask = []
     EVENT2MASK.each do |key, value|
-      bitmask << key if (value & mask) != 0
+      mask << key if (value & bitmask) != 0
     end
-    return bitmask
+    return mask
   end
   module_function :bitmask2events
 
@@ -119,7 +124,8 @@ module Trace
   end
   module_function :'event_masks='
 
-  # Replacement for Kernel set_trace - allows for a more liberal event mask
+  # Replacement for Kernel::set_trace We allow for a more flexible
+  # event mask parameters to be set.
   def set_trace_func(*args)
     if args.size > 3 or args.size < 1
       raise ArgumentError, "wrong number of arguments (#{args.size} for 1..2)"
@@ -154,7 +160,7 @@ if __FILE__ == $0
   p events2bitmask([:foo, 'bar'])
   p events2bitmask(['C call', ['bar']])
   p events2bitmask(['C call', ['bar']])
-  def foo ; end
+  def foo ; end # :nodoc:
   Trace::set_trace_func(Proc.new {|e, tf| p e}, [:call, :return])
   foo
   Trace::event_masks.each { |m| print "event mask: 0x%x\n" % m }

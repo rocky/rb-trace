@@ -16,11 +16,13 @@ class TraceFilter
     
   end
 
-  # fn should be a ThreadFrame or a Proc which has an instruction sequence
+  # +fn+ should be a RubyVM::ThreadFrame object or a Proc which has an
+  # instruction sequence
   def valid_meth?(fn)
     fn.is_a?(Method)
   end
 
+  # Add +meth+ to list of trace filters.
   def <<(meth)
     if valid_meth?(meth)
       @excluded << meth.to_s
@@ -35,6 +37,7 @@ class TraceFilter
     @excluded = Set.new
   end
 
+  # Returns +true+ if +meth+ is a member of the trace filter set.
   def member?(meth)
     if valid_meth?(meth)
       @excluded.member?(meth.to_s)
@@ -43,14 +46,15 @@ class TraceFilter
     end
   end
 
-  # Remove `meth' from the list of functions to include
+  # Remove +meth+ from the list of functions to include.
   def remove(meth)
     return nil unless valid_meth?(meth)
     @excluded -= [meth.to_s]
   end
 
-  # Filter based on @excluded and convert to newer style trace hook
-  # call based on RubyVM::ThreadFrame.
+  # A shim to convert between older-style trace hook call to newer
+  # style trace hook using RubyVM::ThreadFrame. Methods stored in 
+  # @+excluded+ are ignored.
   def trace_hook(event, file, line, id, binding, klass)
     tf = RubyVM::ThreadFrame::current.prev
 
@@ -125,19 +129,19 @@ end
 if __FILE__ == $0
   include Trace
 
-  def square(x)
+  def square(x) # :nodoc:
     y = x * x
     puts "the square of #{x} is #{y}\n"
     y
   end
 
-  def my_hook(event, tf, arg=nil)
+  def my_hook(event, tf, arg=nil) # :nodoc:
     puts "#{event} #{tf.source_container[1]} #{tf.source_location[0]}"
     @events << event
     @line_nos << ((tf.source_location) ? tf.source_location[0] : '?')
   end
 
-  def trace_test(dont_trace_me)
+  def trace_test(dont_trace_me) # :nodoc:
     @start_line = __LINE__
     @trace_filter << self.method(:trace_test) if dont_trace_me
     p @trace_filter.member?(self.method(:trace_test))
@@ -151,13 +155,13 @@ if __FILE__ == $0
     @end_line = __LINE__
   end
 
-  def setup
+  def setup # :nodoc:
     @events   = []
     @line_nos = []
     @trace_filter.clear
   end
 
-  def print_trace
+  def print_trace # :nodoc:
     @line_nos.each_with_index do |line_no, i|
       print "%2d %s %s\n" % [i, @events[i], line_no]
     end

@@ -5,9 +5,10 @@ require_relative %w(.. ext trace)
 # hook which is slower).
 module Trace
 
-  # Event masks from <ruby.h>
+
   unless defined?(NO_EVENT_MASK)
-    NO_EVENT_MASK        = 0x0000
+    NO_EVENT_MASK        = 0x0000   
+    # Event masks from +ruby.h+
     LINE_EVENT_MASK      = 0x0001
     CLASS_EVENT_MASK     = 0x0002
     END_EVENT_MASK       = 0x0004
@@ -23,6 +24,7 @@ module Trace
     SWITCH_EVENT_MASK    = 0x20000
     COVERAGE_EVENT_MASK  = 0x40000
     
+    # Events that will trigger if you don't specify any
     DEFAULT_EVENT_MASK   = 
       BRKPT_EVENT_MASK    |
       CALL_EVENT_MASK     |
@@ -35,6 +37,7 @@ module Trace
       RETURN_EVENT_MASK 
     
     
+    # Symbols we use to represent the individual bits inside a Fixnum bitmask
     EVENT2MASK = {
       :brkpt    => BRKPT_EVENT_MASK,
       :c_call   => C_CALL_EVENT_MASK,

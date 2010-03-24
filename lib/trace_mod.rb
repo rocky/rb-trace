@@ -160,7 +160,8 @@ if __FILE__ == $0
   p events2bitmask([:foo, 'bar'])
   p events2bitmask(['C call', ['bar']])
   p events2bitmask(['C call', ['bar']])
-  def foo ; end # :nodoc:
+  def foo # :nodoc:
+  end 
   Trace::set_trace_func(Proc.new {|e, tf| p e}, [:call, :return])
   foo
   Trace::event_masks.each { |m| print "event mask: 0x%x\n" % m }

@@ -12,8 +12,8 @@ class TraceFilter
 
   def initialize(excluded_meths = [])
     excluded_meths = excluded_meths.select{|fn| valid_meth?(fn)}
+    excluded_meths << self.method(:set_trace_func).to_proc
     @excluded = Set.new(excluded_meths.map{|m| m.to_s})
-    
   end
 
   # +fn+ should be a RubyVM::ThreadFrame object or a Proc which has an

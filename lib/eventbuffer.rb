@@ -74,11 +74,11 @@ class TraceBuffer
       else
         item.source_location.inspect
       end
-          
+    
     mess = "#{item.event} #{item.type} #{item.method} " + 
       "#{container} #{location}"
     if long_format && item.iseq
-      mess += "\n\t" + "#{item.pc_offset} of #{item.iseq.name}"
+      mess += "\n\t" + "VM offset #{item.pc_offset} of #{item.iseq.name}"
     end
     mess
   end
@@ -97,8 +97,11 @@ if __FILE__ == $0
   trace_func   = method(:event_processor).to_proc
   trace_filter << trace_func
   trace_filter.set_trace_func(trace_func)
-  x = 1
-  y = 2
+  z=5
+  z.times do |i|
+    x = i
+    y = x+2
+  end
   trace_filter.set_trace_func(nil)
   @eventbuf.each do |e| 
     puts @eventbuf.format_entry(e) if e

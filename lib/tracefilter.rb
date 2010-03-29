@@ -12,7 +12,7 @@ class TraceFilter
 
   def initialize(excluded_meths = [])
     excluded_meths = excluded_meths.select{|fn| valid_meth?(fn)}
-    excluded_meths << self.method(:set_trace_func).to_proc
+    excluded_meths << self.method(:set_trace_func).to_s
     @excluded = Set.new(excluded_meths.map{|m| m.to_s})
   end
 
@@ -66,11 +66,12 @@ class TraceFilter
       tf_check = tf_check.prev 
     end
     return unless tf_check
+
     begin 
       if tf_check.method && !tf_check.method.empty?
         meth_name = tf_check.method.gsub(/^.* in /, '')
-        meth = eval("self.method(:#{meth_name})", tf_check.binding).to_s
-        if @excluded.member?(meth)
+        meth = eval("self.method(:#{meth_name})", tf_check.binding)
+        if @excluded.member?(meth.to_s)
           return 
         end
       end

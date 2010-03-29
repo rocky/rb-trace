@@ -98,8 +98,9 @@ if __FILE__ == $0
   trace_filter << trace_func
   trace_filter.set_trace_func(trace_func)
   x = 1
+  y = 2
   trace_filter.set_trace_func(nil)
   @eventbuf.each do |e| 
-    puts @eventbuf.format_entry(e)
+    puts @eventbuf.format_entry(e) if e
   end
 end

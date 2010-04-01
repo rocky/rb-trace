@@ -91,8 +91,8 @@ if __FILE__ == $0
       p $!
     end
   end
+  require 'trace'
   @eventbuf = TraceBuffer.new(5)
-  load '/src/external-vcs/rb-trace/lib/tracefilter.rb'
   trace_filter = TraceFilter.new
   trace_func   = method(:event_processor).to_proc
   trace_filter << trace_func

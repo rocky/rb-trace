@@ -3,11 +3,12 @@ class TraceBuffer
                            :source_container, :source_location,
                            :iseq, :pc_offset) unless defined?(EventStruct)
   attr_reader   :buf
-  attr_reader   :size   # Max size of buffer or nil if unlimited.
-  attr_accessor :marks  # User position mark into buffer. If buffer is limited,
+  attr_accessor :marks    # User position mark into buffer. If buffer is limited,
+  attr_reader   :maxsize  # Maximum size of buffer or nil if unlimited.
+  attr_reader   :size     # size of buffer 
   # then marks will drop out as they disappear from the buffer
-  def initialize(size=nil)
-    @size = size
+  def initialize(maxsize=nil)
+    @maxsize = maxsize
     reset
   end
   
@@ -15,6 +16,7 @@ class TraceBuffer
     @buf   = []
     @marks = []
     @pos   = -1
+    @size  = 0 
   end
   
   # Add a new event dropping off old events if that was declared
@@ -27,11 +29,12 @@ class TraceBuffer
     @pos = next_pos
     @marks.shift if @marks[0] == @pos
     @buf[@pos] = item
+    @size     += 1 unless @maxsize && @size == @maxsize
   end
   
   def next_pos
     pos = @pos + 1 
-    if @size && @pos == @size
+    if @maxsize && @pos == @maxsize
       0
     else
       pos
@@ -50,7 +53,7 @@ class TraceBuffer
         yield @buf[pos]
       end
     else
-      from.upto(size-1).each do |pos|
+      from.upto(@size-1).each do |pos|
         yield @buf[pos]
       end
       0.upto(@pos).each do |pos|
@@ -91,8 +94,17 @@ if __FILE__ == $0
       p $!
     end
   end
+  def dump_all
+    puts '-' * 40
+    @eventbuf.each do |e| 
+      puts @eventbuf.format_entry(e) if e
+    end
+  end
+
   require 'trace'
   @eventbuf = TraceBuffer.new(5)
+  dump_all
+
   trace_filter = TraceFilter.new
   trace_func   = method(:event_processor).to_proc
   trace_filter << trace_func
@@ -103,7 +115,7 @@ if __FILE__ == $0
     y = x+2
   end
   trace_filter.set_trace_func(nil)
-  @eventbuf.each do |e| 
-    puts @eventbuf.format_entry(e) if e
-  end
+  dump_all
+  @eventbuf.reset
+  dump_all
 end

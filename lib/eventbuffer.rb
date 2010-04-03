@@ -28,23 +28,12 @@ module Trace
       item = EventStruct.new(event, arg, frame.type, frame.thread, frame.method,
                              frame.source_container, frame.source_location,
                              iseq, iseq ? frame.pc_offset : nil)
-      @pos = next_pos
+      @pos = self.succ_pos
       @marks.shift if @marks[0] == @pos
       @buf[@pos] = item
       @size     += 1 unless @maxsize && @size == @maxsize
     end
 
-    # Return the next event buffer position taking into account
-    # that we may have a fixed-sized buffer ring.
-    def next_pos
-      pos = @pos + 1 
-      if @maxsize && @pos == @maxsize
-        0
-      else
-        pos
-      end
-    end
-    
     # Add mark for the current event buffer position.
     def add_mark
       @marks << @pos
@@ -57,8 +46,8 @@ module Trace
     end
     
     def each(from=nil, to=nil)
-      from = next_pos unless from
-      to   = @pos     unless to
+      from = self.succ_pos unless from
+      to   = @pos unless to
       if from <= to
         from.upto(to).each do |pos|
           yield @buf[pos]
@@ -74,7 +63,7 @@ module Trace
     end
     
     def each_with_index(from=nil, to=nil)
-      from = next_pos unless from
+      from = succ_pos unless from
       to   = @pos     unless to
       if from <= to
         from.upto(to).each do |pos|
@@ -114,12 +103,27 @@ module Trace
       mess
     end
 
+    # Return the next event buffer position taking into account
+    # that we may have a fixed-sized buffer ring.
+    def succ_pos(inc=1)
+      pos = @pos + inc 
+      @maxsize ? pos % @maxsize : pos 
+    end
+    
+    # Return the next event buffer position taking into account
+    # that we may have a fixed-sized buffer ring.
+    def pred_pos(dec=1)
+      pos = @pos - dec
+      @maxsize ? pos % @maxsize : pos 
+    end
+    
     # Return the adjusted zeroth position in @buf.
     def zero_pos
-      return (if !@maxsize || @buf.size < @maxsize
-                0
-              else (@pos + 1) % @maxsize
-              end)
+      if !@maxsize || @buf.size < @maxsize
+        0
+      else 
+        self.succ_pos
+      end
     end
     
   end # EventBuffer

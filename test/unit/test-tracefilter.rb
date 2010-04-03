@@ -9,7 +9,7 @@ class TestTraceFilter < Test::Unit::TestCase
     $args     = []
     $events   = []
     $line_nos = []
-    @trace_filter = TraceFilter.new unless defined?(@trace_filter)
+    @trace_filter = Trace::Filter.new unless defined?(@trace_filter)
     @trace_filter.clear
   end
 

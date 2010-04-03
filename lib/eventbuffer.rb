@@ -1,3 +1,4 @@
+require 'rbdbgr'; 
 module Trace
 
   class EventBuffer
@@ -113,6 +114,15 @@ module Trace
       end
       mess
     end
+
+    # Return the adjusted zeroth position in @buf.
+    def zero_pos
+      return (if !@maxsize || @buf.size < @maxsize
+                0
+              else (@pos + 1) % @maxsize
+              end)
+    end
+    
   end # EventBuffer
 end # Trace 
 
@@ -133,6 +143,7 @@ if __FILE__ == $0
 
   require_relative 'trace'
   @eventbuf = Trace::EventBuffer.new(5)
+  p @eventbuf.zero_pos
   dump_all
 
   trace_filter = Trace::Filter.new
@@ -145,6 +156,7 @@ if __FILE__ == $0
     y = x+2
   end
   trace_filter.set_trace_func(nil)
+  p @eventbuf.buf[@eventbuf.zero_pos]
   dump_all
   @eventbuf.reset
   dump_all

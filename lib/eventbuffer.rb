@@ -1,4 +1,3 @@
-require 'rbdbgr'; 
 module Trace
 
   class EventBuffer

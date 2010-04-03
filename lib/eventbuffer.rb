@@ -33,7 +33,9 @@ module Trace
       @buf[@pos] = item
       @size     += 1 unless @maxsize && @size == @maxsize
     end
-    
+
+    # Return the next event buffer position taking into account
+    # that we may have a fixed-sized buffer ring.
     def next_pos
       pos = @pos + 1 
       if @maxsize && @pos == @maxsize
@@ -43,8 +45,15 @@ module Trace
       end
     end
     
+    # Add mark for the current event buffer position.
     def add_mark
       @marks << @pos
+    end
+
+    # Like add mark, but do only if the last marked position has
+    # changed
+    def add_mark_nodup
+      @marks << @pos unless @marks[-1] == @pos
     end
     
     def each(from=nil, to=nil)
@@ -60,6 +69,23 @@ module Trace
         end
         0.upto(@pos).each do |pos|
           yield @buf[pos]
+        end
+      end
+    end
+    
+    def each_with_index(from=nil, to=nil)
+      from = next_pos unless from
+      to   = @pos     unless to
+      if from <= to
+        from.upto(to).each do |pos|
+          yield [@buf[pos], pos]
+        end
+      else
+        from.upto(@size-1).each do |pos|
+          yield [@buf[pos], pos]
+        end
+        0.upto(@pos).each do |pos|
+          yield [@buf[pos], pos]
         end
       end
     end

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'test/unit'
 require 'set'
-require_relative %w(.. .. lib trace_mod)
+require_relative '../../lib/trace_mod'
 
 class TestEvent2Bitmask < Test::Unit::TestCase
   include Trace

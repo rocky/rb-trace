@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'test/unit'
-require_relative %w(.. .. lib trace_mod)
+require_relative '../../lib/trace_mod'
 
 # Testing Trace Module
 class TestTrace < Test::Unit::TestCase

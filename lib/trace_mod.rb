@@ -1,4 +1,4 @@
-require_relative %w(.. ext trace)
+require_relative '../ext/trace'
 
 # A module for interfacing with Kernel::set_trace which adds
 # filtering of events inside Ruby (as opposed to inside your trace

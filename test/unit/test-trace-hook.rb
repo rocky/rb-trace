@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'test/unit'
-require_relative %w(.. .. ext trace)
+require_relative '../../ext/trace'
 
 # Testing RubyVM::TraceHook
 class TestTraceHook < Test::Unit::TestCase

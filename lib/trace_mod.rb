@@ -129,6 +129,28 @@ module Trace
 
   # Replacement for Kernel::set_trace We allow for a more flexible
   # event mask parameters to be set.
+  def add_trace_func(*args)
+    if args.size > 3 or args.size < 1
+      raise ArgumentError, "wrong number of arguments (#{args.size} for 1..2)"
+    end
+    proc, mask_arg = args
+    if proc.nil? 
+      if args.size != 1
+        raise ArgumentError, 
+        "When first argument (Proc) is nil, there should be only one argument"
+      end
+      return Kernel.set_trace_func(proc)
+    elsif mask_arg.nil?
+      Kernel.add_trace_func(proc)
+    else # args.size == 2
+      event_mask = convert_event_mask(mask_arg)
+      Kernel.add_trace_func(proc, event_mask)
+    end
+  end
+  module_function :add_trace_func
+
+  # Replacement for Kernel::set_trace We allow for a more flexible
+  # event mask parameters to be set.
   def set_trace_func(*args)
     if args.size > 3 or args.size < 1
       raise ArgumentError, "wrong number of arguments (#{args.size} for 1..2)"

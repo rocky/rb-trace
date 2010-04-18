@@ -11,6 +11,7 @@ module Trace
   class Filter
 
     attr_reader :excluded
+    attr_reader :hook_proc
 
     def initialize(excluded_meths = [])
       excluded_meths = excluded_meths.select{|fn| valid_meth?(fn)}
@@ -101,25 +102,51 @@ module Trace
           nil
         end
 
-      retval = @proc.call(event, tf, arg)
+      retval = @hook_proc.call(event, tf, arg)
       if retval.respond_to?(:ancestors) && retval.ancestors.include?(Exception)
         raise retval 
       end
     end
 
-    # Replacement for Kernel.set_trace_func. proc should be a Proc that
+    # Replacement for Kernel.add_trace_func. hook_proc should be a Proc that
     # takes two arguments, a string event, and threadframe object.
-    def set_trace_func(proc, event_mask=nil)
-      if proc.nil?
+    def add_trace_func(hook_proc, event_mask=nil)
+      if hook_proc.nil?
         Kernel.set_trace_func(nil)
         return
       end
       raise TypeError, 
-      "trace_func needs to be Proc or nil (is #{proc.class})" unless 
-        proc.is_a?(Proc)
-      raise TypeError, "arity of proc should be 2 or -3 (is #{proc.arity})" unless 
-        2 == proc.arity || -3 == proc.arity
-      @proc = proc
+      "trace_func needs to be Proc or nil (is #{hook_proc.class})" unless 
+        hook_proc.is_a?(Proc)
+      raise TypeError, "arity of hook_proc should be 2 or -3 (is #{hook_proc.arity})" unless 
+        2 == hook_proc.arity || -3 == hook_proc.arity
+      @hook_proc = hook_proc
+      if event_mask
+        Trace::add_trace_func(method(:trace_hook).to_proc, event_mask)
+      else
+        Kernel.add_trace_func(method(:trace_hook).to_proc)
+      end
+    end
+
+    # FIXME: remove just this trace function
+    def remove_trace_func
+        Kernel.clear_trace_func
+    end
+
+
+    # Replacement for Kernel.set_trace_func. proc should be a Proc that
+    # takes two arguments, a string event, and threadframe object.
+    def set_trace_func(hook_proc, event_mask=nil)
+      if hook_proc.nil?
+        Kernel.set_trace_func(nil)
+        return
+      end
+      raise TypeError, 
+      "trace_func needs to be Proc or nil (is #{hook_proc.class})" unless 
+        hook_proc.is_a?(Proc)
+      raise TypeError, "arity of hook_proc should be 2 or -3 (is #{hook_proc.arity})" unless 
+        2 == hook_proc.arity || -3 == hook_proc.arity
+      @hook_proc = hook_proc
       if event_mask
         Trace::set_trace_func(method(:trace_hook).to_proc, event_mask)
       else

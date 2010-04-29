@@ -24,6 +24,12 @@ module Trace
     # Add a new event dropping off old events if that was declared
     # marks are also dropped if buffer has a limit.
     def append(event, frame, arg)
+      if 'c-return' == event 
+        arg = frame.sp(2)
+      elsif 'return' == event 
+        arg = frame.sp(1)
+      end
+        
       iseq = frame.iseq
       item = EventStruct.new(event, arg, frame.type, frame.thread, frame.method,
                              frame.source_container, frame.source_location,

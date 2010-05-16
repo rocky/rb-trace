@@ -75,6 +75,16 @@ module Trace
           meth_name = tf_check.method.gsub(/^.* in /, '')
           meth = eval("self.method(:#{meth_name})", tf_check.binding)
           if @excluded.member?(meth.to_s)
+            # Turn off tracing for any calls from this frame.  Note
+            # that Ruby turns of tracing in the thread of a hook while
+            # it is running, but I don't think this is as good as
+            # turning it off in the frame and frames called from that.
+            # Example: if a trace hook yields to or calls a block
+            # outside not derived from the frame, then tracing should
+            # start again.  But either way, since RubyVM::ThreadFrame
+            # allows control over tracing *any* decision is not
+            # irrevocable, just possibly unhelpful.
+            tf_check.trace_off = true
             return 
           end
         end

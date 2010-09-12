@@ -13,7 +13,7 @@ end
 EXT_FILES    = FileList[%w(ext/*.c ext/*.h)]
 LIB_FILES    = FileList['lib/*.rb']
 TEST_FILES   = FileList['test/**/*.rb']
-COMMON_FILES = FileList[%w(Rakefile)]
+COMMON_FILES = FileList[%w(Rakefile NEWS LICENSE)]
 ALL_FILES    = COMMON_FILES + TEST_FILES + EXT_FILES + LIB_FILES
 
 desc "Create a GNU-style ChangeLog via git2cl"
@@ -82,12 +82,12 @@ EOF
   spec.extensions = ['ext/extconf.rb']
 
   spec.author = "R. Bernstein"
-  spec.email = "rocky@gnu.org"
+  spec.email = "rockyb@rubyforge.org"
   spec.platform = Gem::Platform::RUBY
   spec.files = ALL_FILES.to_a  
-  spec.add_dependency('rb-threadframe', '>= 0.2')
+  spec.add_dependency('rb-threadframe', '>= 0.32')
 
-  spec.required_ruby_version = '>= 1.9.1'
+  spec.required_ruby_version = '>= 1.9.2'
   spec.date = Time.now
   # spec.rubyforge_project = 'rocky-hacks'
   

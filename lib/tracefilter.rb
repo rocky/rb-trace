@@ -65,7 +65,7 @@ module Trace
       # what's going on better.
       tf_check = tf
 
-      while %w(BLOCK IFUNC CFUNC).member?(tf_check.type) do 
+      while %w(IFUNC CFUNC).member?(tf_check.type) do 
         tf_check = tf_check.prev 
       end
       return unless tf_check

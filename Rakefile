@@ -37,6 +37,11 @@ task :ext do
   end
 end
 
+desc 'Create a GNU-style ChangeLog via git2cl'
+task :ChangeLog do
+  system('git log --pretty --numstat --summary | git2cl > ChangeLog')
+end
+
 desc 'Remove built files'
 task :clean do
   cd 'ext' do

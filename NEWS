@@ -1,2 +1,5 @@
+December 25 2010 (0.3)
+  Minor bug fix: don't ignoring BLOCK frame types in filtering.
+
 September 12 2010 (0.2)
   First release on gemcutter

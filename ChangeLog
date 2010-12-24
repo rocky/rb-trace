@@ -1,3 +1,163 @@
+2010-12-01  rocky <rockyb@rubyforge.org>
+
+	* ext/trace.c, lib/tracefilter.rb: Try not ignoring BLOCK types.
+
+2010-09-12  rocky <rockyb@rubyforge.org>
+
+	* LICENSE, NEWS, Rakefile, ext/trace.c: Get ready for 0.2 release.
+
+2010-05-15  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb: Turn off tracing for any calls from this
+	excluded frames.  See note in change.  There may be a bug in my Ruby
+	1.9 patch that this tickles. So this change we may have to backed
+	out, if we can't fix the Ruby patch.
+
+2010-04-28  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb: Save return values.
+
+2010-04-25  rocky <rockyb@rubyforge.org>
+
+	* Rakefile: User needs to use "sudo rake install" when needed.
+
+2010-04-17  rocky <rockyb@rubyforge.org>
+
+	* lib/trace_mod.rb, lib/tracefilter.rb: trace_mod.rb: add
+	add_trace_func tracefilter.rb: save hook function for testing if
+	it's been added before.
+
+2010-04-04  rocky <rockyb@rubyforge.org>
+
+	* lib/trace_mod.rb, test/unit/test-event2bitmask.rb,
+	test/unit/test-trace-hook.rb, test/unit/test-trace_mod.rb,
+	test/unit/test-tracefilter.rb: require_relative %w(a b c) =>
+	require_relative 'a/b/c' Starting with SVN revision #26959 require_relative no longer accepts
+	an array argument.
+
+2010-04-03  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb: next_pos, prev_pos -> pred_pos, suc_pos and
+	tidy code a little.
+
+2010-04-03  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb: Remove debug 'rbdbgr'
+
+2010-04-03  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb: Add method to get oldest (zeroth) item.
+
+2010-04-03  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb: Add some more methods based on use.
+
+2010-04-03  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb, lib/tracefilter.rb,
+	test/unit/test-tracefilter.rb: Put classes under Trace module. So
+	TraceFilter -> Trace::Filter TraceBuffer -> Trace::EventBuffer
+
+2010-04-02  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb: Handle rings and unlimited buffers that are
+	not their full size better.
+
+2010-04-01  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb, lib/trace.rb: Small TraceBuffer packaging
+	fixes.
+
+2010-03-29  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb: More tracing.
+
+2010-03-29  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb, lib/tracefilter.rb: Excude tracefilter's
+	set_trace_func from tracing. Some small eventbuffer changes.
+
+2010-03-25  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb, lib/tracefilter.rb: Start routines to save
+	trace events.
+
+2010-03-24  rocky <rockyb@rubyforge.org>
+
+	* lib/trace_mod.rb: rdoc hacking.
+
+2010-03-24  rocky <rockyb@rubyforge.org>
+
+	* lib/trace_mod.rb: More rdoc coaxing
+
+2010-03-24  rocky <rockyb@rubyforge.org>
+
+	* : commit 4b24d531eb05d78a51633544ccb8e633e92cdf24 Author: rocky
+	<rockyb@rubyforge.org> Date:   Wed Mar 24 04:17:54 2010 -0400
+
+2010-03-23  rocky <rockyb@rubyforge.org>
+
+	* Rakefile: This time, for sure!
+
+2010-03-23  rocky <rockyb@rubyforge.org>
+
+	* Rakefile: I hate conflicted merges.
+
+2010-03-23  rocky <rockyb@rubyforge.org>
+
+	* : commit d8d9c54843540abc316dab5c570518a0d7944d02 Author: rocky
+	<rockyb@rubyforge.org> Date:   Tue Mar 23 10:06:25 2010 -0400
+
+2010-03-19  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb: remove debug print statement.
+
+2010-03-19  rocky <rockyb@rubyforge.org>
+
+	* Rakefile, lib/tracefilter.rb: tracefilter.rb: provide for hooks to
+	return an exception Rakefile: add "sudo" to install and quicker
+	"rake install" by default by avoiding ri.
+
+2010-03-15  rocky <rockyb@rubyforge.org>
+
+	* : commit 001bfda497be8039cbddf431657f5dfbb8f1052f Author: rocky
+	<rockyb@rubyforge.org> Date:   Sun Mar 14 00:16:39 2010 -0500
+
+2010-03-10  rocky <rocky@ubuntu-vm.(none)>
+
+	* Rakefile: Add sudo when needed
+
+2010-03-05  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Ruby 1.9 patch
+	changes now remove the c-call from set_trace_func as I think it
+	should.
+
+2010-03-04  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Add
+	TraceFilter#member?
+
+2010-03-01  rocky <rockyb@rubyforge.org>
+
+	* Rakefile: Add "rake install" task
+
+2010-02-19  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: There is what
+	looks like a a bug in Ruby where self.class for C functions are not
+	set correctly.  Until this is fixed in what I consider a more proper way, we'll hack
+	around this by passing the binding as the optional arg parameter.
+
+2010-02-16  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Filter out
+	IFUNC call stack types.
+
+2009-11-01  rocky <rockyb@rubyforge.org>
+
+	* ChangeLog, Rakefile: Add rake task to create ChangeLog.
+
 2009-10-16  R. Bernstein <rocky@gnu.org>
 
 	* lib/trace_mod.rb, test/unit/test-event2bitmask.rb: Add breakpoint
@@ -16,7 +176,7 @@
 2009-09-19  rocky <rockyb@rubyforge.org>
 
 	* lib/tracefilter.rb: In entering a class the method name can come
-	back "CLASS" and this is not a valid method. NameError is returned
+	back "CLASS" and this is not a valid method.  NameError is returned
 	here.
 
 2009-09-17  rockyb <rocky@gnu.org>
@@ -69,7 +229,7 @@
 2009-08-16  rocky <rockyb@rubyforge.org>
 
 	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Add instruction
-	sequence filtering, and convenience method to skip "this one". Test
+	sequence filtering, and convenience method to skip "this one".  Test
 	all of this.
 
 2009-08-14  rockyb <rocky@gnu.org>
@@ -110,9 +270,8 @@
 2009-08-13  R. Bernstein <rocky@gnu.org>
 
 	* Rakefile, ext/trace.c, test/unit/test-trace-hook.rb: ext/trace.c:
-	Check trace hook validity before accessing fields. Add valid?
-	method. Add  RubyVM::TraceHookError exception class.
-	test-trace-hook.rb: test the modifications to ext/trace.c Rakefile:
+	 Check trace hook validity before accessing fields. Add valid?
+	 method. Add RubyVM::TraceHookError exception class.  test-trace-hook.rb: test the modifications to ext/trace.c Rakefile:
 	More complete. Add "ext", "clean" and "check". test/check depends on
 	"ext".
 

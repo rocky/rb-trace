@@ -9,7 +9,11 @@
 2010-05-15  rocky <rockyb@rubyforge.org>
 
 	* lib/tracefilter.rb: Turn off tracing for any calls from this
+<<<<<<< HEAD
 	excluded frames.  See note in change. There may be a bug in my Ruby
+=======
+	excluded frames.  See note in change.  There may be a bug in my Ruby
+>>>>>>> 7d7b49872be59187c7e4cffaadf08db80a4acebf
 	1.9 patch that this tickles. So this change we may have to backed
 	out, if we can't fix the Ruby patch.
 
@@ -32,8 +36,13 @@
 	* lib/trace_mod.rb, test/unit/test-event2bitmask.rb,
 	test/unit/test-trace-hook.rb, test/unit/test-trace_mod.rb,
 	test/unit/test-tracefilter.rb: require_relative %w(a b c) =>
+<<<<<<< HEAD
 	require_relative 'a/b/c'  Starting with SVN revision #26959
 	require_relative no longer accepts an array argument.
+=======
+	require_relative 'a/b/c' Starting with SVN revision #26959 require_relative no longer accepts
+	an array argument.
+>>>>>>> 7d7b49872be59187c7e4cffaadf08db80a4acebf
 
 2010-04-03  rocky <rockyb@rubyforge.org>
 
@@ -92,11 +101,16 @@
 
 2010-03-24  rocky <rockyb@rubyforge.org>
 
+<<<<<<< HEAD
 	Merge branch 'master' of git@github.com:rocky/rb-trace
 
 2010-03-24  rocky <rockyb@rubyforge.org>
 
 	* lib/trace_mod.rb, lib/tracefilter.rb: rdoc updates
+=======
+	* : commit 4b24d531eb05d78a51633544ccb8e633e92cdf24 Author: rocky
+	<rockyb@rubyforge.org> Date:   Wed Mar 24 04:17:54 2010 -0400
+>>>>>>> 7d7b49872be59187c7e4cffaadf08db80a4acebf
 
 2010-03-23  rocky <rockyb@rubyforge.org>
 
@@ -108,12 +122,17 @@
 
 2010-03-23  rocky <rockyb@rubyforge.org>
 
+<<<<<<< HEAD
 	Merge branch 'master' of git@github.com:rocky/rb-trace
 	Conflicts: 	Rakefile  Conflicts: 	Rakefile
 
 2010-03-23  rocky <rockyb@rubyforge.org>
 
 	* ext/.gitignore: Ignore config options.
+=======
+	* : commit d8d9c54843540abc316dab5c570518a0d7944d02 Author: rocky
+	<rockyb@rubyforge.org> Date:   Tue Mar 23 10:06:25 2010 -0400
+>>>>>>> 7d7b49872be59187c7e4cffaadf08db80a4acebf
 
 2010-03-19  rocky <rockyb@rubyforge.org>
 
@@ -127,6 +146,7 @@
 
 2010-03-15  rocky <rockyb@rubyforge.org>
 
+<<<<<<< HEAD
 	Merge branch 'master' of git@github.com:rocky/rb-trace
 
 2010-03-14  rocky <rockyb@rubyforge.org>
@@ -134,6 +154,10 @@
 	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Ruby has been
 	changed to pass th->errinfo via the "klass" parameter on a raise
 	exception. Here we convert that to our hook "arg" parameter.
+=======
+	* : commit 001bfda497be8039cbddf431657f5dfbb8f1052f Author: rocky
+	<rockyb@rubyforge.org> Date:   Sun Mar 14 00:16:39 2010 -0500
+>>>>>>> 7d7b49872be59187c7e4cffaadf08db80a4acebf
 
 2010-03-10  rocky <rocky@ubuntu-vm.(none)>
 
@@ -158,9 +182,14 @@
 
 	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: There is what
 	looks like a a bug in Ruby where self.class for C functions are not
+<<<<<<< HEAD
 	set correctly.  Until this is fixed in what I consider a more proper
 	way, we'll hack around this by passing the binding as the optional
 	arg parameter.
+=======
+	set correctly.  Until this is fixed in what I consider a more proper way, we'll hack
+	around this by passing the binding as the optional arg parameter.
+>>>>>>> 7d7b49872be59187c7e4cffaadf08db80a4acebf
 
 2010-02-16  rocky <rockyb@rubyforge.org>
 
@@ -189,7 +218,7 @@
 2009-09-19  rocky <rockyb@rubyforge.org>
 
 	* lib/tracefilter.rb: In entering a class the method name can come
-	back "CLASS" and this is not a valid method. NameError is returned
+	back "CLASS" and this is not a valid method.  NameError is returned
 	here.
 
 2009-09-17  rockyb <rocky@gnu.org>
@@ -242,7 +271,7 @@
 2009-08-16  rocky <rockyb@rubyforge.org>
 
 	* lib/tracefilter.rb, test/unit/test-tracefilter.rb: Add instruction
-	sequence filtering, and convenience method to skip "this one". Test
+	sequence filtering, and convenience method to skip "this one".  Test
 	all of this.
 
 2009-08-14  rockyb <rocky@gnu.org>
@@ -283,9 +312,8 @@
 2009-08-13  R. Bernstein <rocky@gnu.org>
 
 	* Rakefile, ext/trace.c, test/unit/test-trace-hook.rb: ext/trace.c:
-	Check trace hook validity before accessing fields. Add valid?
-	method. Add  RubyVM::TraceHookError exception class.
-	test-trace-hook.rb: test the modifications to ext/trace.c Rakefile:
+	 Check trace hook validity before accessing fields. Add valid?
+	 method. Add RubyVM::TraceHookError exception class.  test-trace-hook.rb: test the modifications to ext/trace.c Rakefile:
 	More complete. Add "ext", "clean" and "check". test/check depends on
 	"ext".
 

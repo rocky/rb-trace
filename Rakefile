@@ -13,7 +13,7 @@ end
 EXT_FILES    = FileList[%w(ext/*.c ext/*.h)]
 LIB_FILES    = FileList['lib/*.rb']
 TEST_FILES   = FileList['test/**/*.rb']
-COMMON_FILES = FileList[%w(Rakefile NEWS LICENSE)]
+COMMON_FILES = FileList[%w(Rakefile NEWS LICENSE README.textile)]
 ALL_FILES    = COMMON_FILES + TEST_FILES + EXT_FILES + LIB_FILES
 
 desc "Create a GNU-style ChangeLog via git2cl"
@@ -92,7 +92,7 @@ EOF
   spec.files = ALL_FILES.to_a  
   spec.add_dependency('rb-threadframe', '>= 0.32')
 
-  spec.required_ruby_version = '>= 1.9.2'
+  spec.required_ruby_version = '~> 1.9.2'
   spec.date = Time.now
   # spec.rubyforge_project = 'rocky-hacks'
   

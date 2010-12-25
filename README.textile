@@ -1,0 +1,2 @@
+rb-trace adds a trace_hook object, translates hooks bitmasks to sets and vice versa, and extends set_trace_func to ignore frames or
+functions.

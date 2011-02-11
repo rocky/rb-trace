@@ -26,7 +26,7 @@ task :'test:unit' => [:ext] do |t|
   Rake::TestTask.new(:'test:unit') do |t|
     t.test_files = FileList['test/unit/**/*.rb']
     # t.pattern = 'test/**/*test-*.rb' # instead of above
-    t.verbose = true
+    t.options = '--verbose' if $VERBOSE
   end
 end
 
@@ -92,7 +92,7 @@ EOF
   spec.files = ALL_FILES.to_a  
   spec.add_dependency('rb-threadframe', '>= 0.32')
 
-  spec.required_ruby_version = '~> 1.9.2'
+  spec.required_ruby_version = '~> 1.9.2frame'
   spec.date = Time.now
   # spec.rubyforge_project = 'rocky-hacks'
   

@@ -1,7 +1,7 @@
 #include "vm_core_mini.h"  /* Pulls in ruby.h */
 
 /* What release we got? */
-#define TRACE_VERSION "0.4"  
+#define TRACE_VERSION "0.5.dev"  
 
 extern VALUE rb_cRubyVM;   /* RubyVM class */
 extern rb_vm_t *ruby_current_vm;

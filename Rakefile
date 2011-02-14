@@ -90,7 +90,7 @@ EOF
   spec.email = "rockyb@rubyforge.org"
   spec.platform = Gem::Platform::RUBY
   spec.files = ALL_FILES.to_a  
-  spec.add_dependency('rb-threadframe', '>= 0.32')
+  spec.add_dependency('rb-threadframe', '~> 0.38.dev')
 
   spec.required_ruby_version = '~> 1.9.2frame'
   spec.date = Time.now

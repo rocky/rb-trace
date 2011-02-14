@@ -19,6 +19,9 @@ module Trace
     RAISE_EVENT_MASK     = 0x0080
     INSN_EVENT_MASK      = 0x0100
     BRKPT_EVENT_MASK     = 0x0200
+    SEND_EVENT_MASK      = 0x0400
+    LEAVE_EVENT_MASK     = 0x0800
+    YIELD_EVENT_MASK     = 0x1000
     ALL_EVENT_MASKS      = (0xffff & ~INSN_EVENT_MASK)
     VM_EVENT_MASK        = 0x10000
     SWITCH_EVENT_MASK    = 0x20000
@@ -32,9 +35,12 @@ module Trace
       C_CALL_EVENT_MASK   |
       C_RETURN_EVENT_MASK |
       END_EVENT_MASK      |
+      LEAVE_EVENT_MASK    |
       LINE_EVENT_MASK     |
       RAISE_EVENT_MASK    |
-      RETURN_EVENT_MASK 
+      RETURN_EVENT_MASK   |
+      SEND_EVENT_MASK     |
+      YIELD_EVENT_MASK
     
     
     # Symbols we use to represent the individual bits inside a Fixnum bitmask
@@ -47,11 +53,14 @@ module Trace
       :coverage => COVERAGE_EVENT_MASK,
       :end      => END_EVENT_MASK,
       :insn     => INSN_EVENT_MASK,
+      :leave    => LEAVE_EVENT_MASK,
       :line     => LINE_EVENT_MASK,
       :raise    => RAISE_EVENT_MASK,
       :return   => RETURN_EVENT_MASK,
+      :send     => SEND_EVENT_MASK,
       :switch   => SWITCH_EVENT_MASK,
-      :vm       => VM_EVENT_MASK
+      :vm       => VM_EVENT_MASK,
+      :yield    => YIELD_EVENT_MASK
     }
 
     EVENTS = EVENT2MASK.keys.sort

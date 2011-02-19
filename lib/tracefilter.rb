@@ -1,3 +1,4 @@
+#  Copyright (C) 2011 Rocky Bernstein <rockyb@rubyforge.net>
 require 'set'
 # require '/src/external-vcs/rb-threadframe/ext/thread_frame'
 require 'thread_frame'

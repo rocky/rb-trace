@@ -25,7 +25,7 @@ EOF
   spec.email = "rockyb@rubyforge.org"
   spec.platform = Gem::Platform::RUBY
   spec.files = `git ls-files`.split("\n")
-  spec.add_dependency('rb-threadframe', '>= 0.38')
+  spec.add_dependency('rb-threadframe', '~> 0.40')
 
   spec.required_ruby_version = '~> 1.9.2frame'
   spec.date = Time.now

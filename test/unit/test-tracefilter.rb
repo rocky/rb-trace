@@ -60,7 +60,12 @@ class TestTraceFilter < Test::Unit::TestCase
 
     assert_equal(false, $events.empty?, 
                  'We should have gotting some trace output')
-    assert_equal([Kernel], $args,
+    if '1.9.3' == RUBY_VERSION
+      expected = [Kernel, Kernel]
+    else
+      expected = [Kernel]
+    end
+    assert_equal(expected, $args,
                  'C call/returns set $args')
 
     $line_nos.each_with_index do 

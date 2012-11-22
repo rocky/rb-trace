@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'test/unit'
-require_relative '../../lib/trace_mod'
+require_relative '../../lib/trace_mod' if '1.9.2' == RUBY_VERSION
 
 # Testing Trace Module
 class TestTrace < Test::Unit::TestCase

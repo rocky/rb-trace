@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 require 'test/unit'
-require_relative '../../ext/trace'
+require_relative '../../ext/trace' if '1.9.2' == RUBY_VERSION
 
 # Testing RubyVM::TraceHook
 class TestTraceHook < Test::Unit::TestCase

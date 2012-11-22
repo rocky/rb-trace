@@ -1,6 +1,7 @@
 #!/usr/bin/env rake
 # -*- Ruby -*-
 require 'rubygems'
+require 'fileutils'
 
 ROOT_DIR = File.dirname(__FILE__)
 Gemspec_filename='rb-trace.gemspec'
@@ -45,11 +46,11 @@ Rake::TestTask.new(:'test:unit') do |t|
   t.options = '--verbose' if $VERBOSE
 end
 
-desc "Create the core ruby-debug shared library extension"
+desc "Create the core rb-trace shared library extension"
 task :ext do
   Dir.chdir('ext') do
     system("#{Gem.ruby} extconf.rb && make")
-  end
+  end if '1.9.2' == RUBY_VERSION
 end
 
 desc 'Remove built files'

@@ -1,4 +1,4 @@
-require_relative '../ext/trace'
+require_relative '../ext/trace' if '1.9.2' == RUBY_VERSION
 
 # A module for interfacing with Kernel::set_trace which adds
 # filtering of events inside Ruby (as opposed to inside your trace

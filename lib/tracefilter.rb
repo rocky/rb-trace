@@ -20,7 +20,7 @@ module Trace
       @excluded = Set.new(excluded_meths.map{|m| m.to_s})
     end
 
-    # +fn+ should be a RubyVM::ThreadFrame object or a Proc which has an
+    # +fn+ should be a RubyVM::Frame object or a Proc which has an
     # instruction sequence
     def valid_meth?(fn)
       fn.is_a?(Method)
@@ -57,10 +57,10 @@ module Trace
     end
 
     # A shim to convert between older-style trace hook call to newer
-    # style trace hook using RubyVM::ThreadFrame. Methods stored in 
+    # style trace hook using RubyVM::Frame. Methods stored in 
     # @+excluded+ are ignored.
     def trace_hook(event, file, line, id, binding, klass)
-      tf = RubyVM::ThreadFrame::current.prev
+      tf = RubyVM::Frame::current.prev
 
       # FIXME: Clean this mess up. And while your at it, understand
       # what's going on better.
@@ -82,7 +82,7 @@ module Trace
             # turning it off in the frame and frames called from that.
             # Example: if a trace hook yields to or calls a block
             # outside not derived from the frame, then tracing should
-            # start again.  But either way, since RubyVM::ThreadFrame
+            # start again.  But either way, since RubyVM::Frame
             # allows control over tracing *any* decision is not
             # irrevocable, just possibly unhelpful.
             tf_check.trace_off = true

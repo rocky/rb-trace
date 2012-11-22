@@ -33,13 +33,13 @@ and vice versa, and extends set_trace_func to ignore frames or
 functions.
 EOF
 
-  spec.version = PACKAGE_VERSION
+  spec.version      = PACKAGE_VERSION
   spec.extensions   = ["ext/extconf.rb"] if '1.9.2' == RUBY_VERSION
 
-  spec.email = "rockyb@rubyforge.org"
+  spec.email        = "rockyb@rubyforge.org"
   spec.platform     = Gem::Platform::RUBY
   spec.files        = FILES.to_a  
-  spec.add_dependency('rb-threadframe', '>= 0.38')
+  spec.add_dependency('rb-threadframe', '~> 0.40')
 
   spec.required_ruby_version = '~> 1.9.2frame'
   spec.date = Time.now

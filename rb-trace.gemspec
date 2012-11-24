@@ -39,9 +39,9 @@ EOF
   spec.email        = "rockyb@rubyforge.org"
   spec.platform     = Gem::Platform::RUBY
   spec.files        = FILES.to_a  
-  spec.add_dependency('rb-threadframe', '~> 0.40')
+  spec.add_dependency('rb-threadframe', '>= 0.39.9')
 
-  spec.required_ruby_version = '~> 1.9.2frame'
+  # spec.required_ruby_version = '~> 1.9.2frame'
   spec.date = Time.now
   # spec.rubyforge_project = 'rocky-hacks'
   

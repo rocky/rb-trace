@@ -12,13 +12,11 @@ spec = Gem::Specification.new do |spec|
   spec.authors      = ['R. Bernstein']
   spec.name         = 'rb-trace'
   
-  spec.homepage     = 'http://github.com/rocky/rb-trace/tree/master'
+  spec.homepage     = 'https://github.com/rocky/rb-trace/wiki'
   spec.summary      = 'Trace hook extensions'
   spec.description  = <<-EOF
 
-rb-trace adds a trace_hook object, translates hooks bitmasks to sets
-and vice versa, and extends set_trace_func to ignore frames or
-functions.
+rb-trace adds a trace_hook object, translates hooks bitmasks to Ruby sets and vice versa, and extends set_trace_func() to allow ignore specified frames or functions.
 EOF
 
   spec.version      = PACKAGE_VERSION

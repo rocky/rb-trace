@@ -1,3 +1,68 @@
+2012-11-25  rocky <rockyb@rubyforge.org>
+
+	* NEWS, ext/version.h: Get ready for 0.6 release.
+
+2012-11-25  rocky <rockyb@rubyforge.org>
+
+	* rb-trace.gemspec: Update homepage
+
+2012-11-25  rocky <rockyb@rubyforge.org>
+
+	* README.textile, Rakefile, rb-trace.gemspec: Modernize stuff.
+
+2012-11-25  rocky <rockyb@rubyforge.org>
+
+	* .gitignore, ext/1.9.2/trace.c, ext/1.9.3/trace.c, ext/extconf.rb,
+	ext/version.h, rb-trace.gemspec: Create bogus C extension for 1.9.3
+	since we need one for 1.9.2 and the combination of gems and mkmf
+	aren't conducive enough to make allow an optional C-extension. Move
+	version info into common version.h
+
+2012-11-24  rocky <rockyb@rubyforge.org>
+
+	* ext/1.9.2/thread_pthread.h: Reinstate header needed on MRI 1.9.2
+
+2012-11-24  rocky <rockyb@rubyforge.org>
+
+	* ext/1.9.2/trace.c, rb-trace.gemspec: Change version number and
+	what versions of rb-threadframe we allow.
+
+2012-11-21  rocky <rockyb@rubyforge.org>
+
+	Merge branch 'master' of github.com:rocky/rb-trace  Conflicts:
+	rb-trace.gemspec
+
+2012-11-21  rocky <rockyb@rubyforge.org>
+
+	* Rakefile, ext/1.9.2/trace.c, ext/1.9.2/vm_core_mini.h,
+	ext/extconf.rb, ext/trace.c, ext/vm_core_mini.h, lib/trace_mod.rb,
+	rb-trace.gemspec, test/unit/test-trace-hook.rb,
+	test/unit/test-trace_mod.rb, test/unit/test-tracefilter.rb: Now
+	works on Ruby 1.9.3.
+
+2012-07-02  rocky <rockyb@rubyforge.org>
+
+	* lib/tracefilter.rb, rb-trace.gemspec: ThreadFrame -> Frame
+
+2011-03-29  rocky <rockyb@rubyforge.org>
+
+	* ext/trace.c, rb-trace.gemspec: Add gemspec file. Previously forgot
+	to add
+
+2011-03-28  rocky <rockyb@rubyforge.org>
+
+	Merge branch 'master' of github.com:rocky/rb-trace
+
+2011-03-28  rocky <rockyb@rubyforge.org>
+
+	* ChangeLog, NEWS, Rakefile, ext/trace.c: Get ready for release 0.5.
+
+
+2011-02-19  rocky <rockyb@rubyforge.org>
+
+	* lib/eventbuffer.rb, lib/tracefilter.rb: Start adding copyright in
+	files
+
 2011-02-13  rocky <rockyb@rubyforge.org>
 
 	* Rakefile, lib/trace_mod.rb: Add support for send, leave, and yield

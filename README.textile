@@ -1,2 +1,3 @@
-rb-trace adds a trace_hook object, translates hooks bitmasks to sets and vice versa, and extends set_trace_func to ignore frames or
-functions.
+_rb-trace_ adds a trace_hook object, translates hooks bitmasks to Ruby sets and vice versa, and extends _set_trace_func()_ to allow ignore specified frames or functions.
+
+See "this":https://github.com/rocky/rb-trace/wiki/irb-method%2C-class%2C-and-definition-capturing for a cool non-debugger use of this.

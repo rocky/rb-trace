@@ -10,7 +10,7 @@ def gemspec
   @gemspec ||= eval(File.read(Gemspec_filename), binding, Gemspec_filename)
 end
 
-require 'rake/gempackagetask'
+require 'rubygems/package_task'
 desc "Build the gem"
 task :package=>:gem
 task :gem=>:gemspec do

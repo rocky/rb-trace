@@ -20,12 +20,11 @@ rb-trace adds a trace_hook object, translates hooks bitmasks to Ruby sets and vi
 EOF
 
   spec.version      = PACKAGE_VERSION
-  spec.extensions   = ['ext/extconf.rb']
 
   spec.email        = 'rockyb@rubyforge.org'
   spec.platform     = Gem::Platform::RUBY
   spec.files        = `git ls-files`.split("\n")
-  spec.add_dependency('rb-threadframe', '>= 0.39.9')
+  spec.add_dependency('rb-threadframe', '>= 0.40.1')
 
   # spec.required_ruby_version = '~> 1.9.2frame'
   spec.date = Time.now

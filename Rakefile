@@ -38,31 +38,11 @@ task :ChangeLog do
 end
 
 desc 'Test units - the smaller tests'
-task :'test:unit' => :ext
+task :'test:unit'
 Rake::TestTask.new(:'test:unit') do |t|
-  t.libs << './ext'
   t.test_files = FileList['test/unit/**/*.rb']
   # t.pattern = 'test/**/*test-*.rb' # instead of above
   t.options = '--verbose' if $VERBOSE
-end
-
-desc "Create the core rb-trace shared library extension"
-task :ext do
-  Dir.chdir('ext') do
-    system("#{Gem.ruby} extconf.rb && make")
-  end if '1.9.2' == RUBY_VERSION
-end
-
-desc 'Remove built files'
-task :clean do
-  cd 'ext' do
-    if File.exist?('Makefile')
-      sh 'make clean'
-      rm  'Makefile'
-    end
-    derived_files = Dir.glob('.o') + Dir.glob('*.so')
-    rm derived_files unless derived_files.empty?
-  end
 end
 
 desc "Default action is same as 'test'."

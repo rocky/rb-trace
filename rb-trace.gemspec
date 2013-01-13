@@ -4,9 +4,8 @@ require 'rake'
 require 'rubygems' unless 
   Object.const_defined?(:Gem)
 
-PACKAGE_VERSION = open('ext/version.h') do |f| 
-  f.grep(/^#define TRACE_VERSION/).first[/"(.+)"/,1]
-end
+require File.dirname(__FILE__) + '/lib/trace' unless 
+  Object.const_defined?(:'Trace') and Trace.const_defined?(:VERSION)
 
 spec = Gem::Specification.new do |spec|
   spec.authors      = ['R. Bernstein']
@@ -19,12 +18,12 @@ spec = Gem::Specification.new do |spec|
 rb-trace adds a trace_hook object, translates hooks bitmasks to Ruby sets and vice versa, and extends set_trace_func() to allow ignore specified frames or functions.
 EOF
 
-  spec.version      = PACKAGE_VERSION
+  spec.version      = Trace::VERSION
 
   spec.email        = 'rockyb@rubyforge.org'
   spec.platform     = Gem::Platform::RUBY
   spec.files        = `git ls-files`.split("\n")
-  spec.add_dependency('rb-threadframe', '>= 0.40.1')
+  spec.add_dependency('rb-threadframe', '>= 0.41')
 
   # spec.required_ruby_version = '~> 1.9.2frame'
   spec.date = Time.now

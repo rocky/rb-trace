@@ -1,7 +1,8 @@
 #  Copyright (C) 2011 Rocky Bernstein <rockyb@rubyforge.net>
+# NOTE: This module is a tempory for transition. In Ruby 2.x we
+# tracepoints should do most of the work we need here.
 require 'set'
 # require '/src/external-vcs/rb-threadframe/ext/thread_frame'
-require 'thread_frame'
 require_relative 'trace_mod'
 
 module Trace
@@ -57,21 +58,21 @@ module Trace
     end
 
     # A shim to convert between older-style trace hook call to newer
-    # style trace hook using RubyVM::Frame. Methods stored in 
+    # style trace hook using RubyVM::Frame. Methods stored in
     # @+excluded+ are ignored.
     def trace_hook(event, file, line, id, binding, klass)
-      tf = RubyVM::Frame::current.prev
+      tf = RubyVM::Frame::get
 
       # FIXME: Clean this mess up. And while your at it, understand
       # what's going on better.
       tf_check = tf
 
-      while %w(IFUNC CFUNC).member?(tf_check.type) do 
-        tf_check = tf_check.prev 
+      while %w(IFUNC CFUNC).member?(tf_check.type) do
+        tf_check = tf_check.prev
       end
       return unless tf_check
 
-      begin 
+      begin
         if tf_check.method && !tf_check.method.empty?
           meth_name = tf_check.method.gsub(/^.* in /, '')
           meth = eval("self.method(:#{meth_name})", tf_check.binding)
@@ -86,24 +87,24 @@ module Trace
             # allows control over tracing *any* decision is not
             # irrevocable, just possibly unhelpful.
             tf_check.trace_off = true
-            return 
+            return
           end
         end
       rescue NameError
       rescue SyntaxError
       rescue ArgumentError
       end
-      while %w(IFUNC).member?(tf.type) do 
-        tf = tf.prev 
+      while %w(IFUNC).member?(tf.type) do
+        tf = tf.prev
       end
 
       # There is what looks like a a bug in Ruby where self.class for C
       # functions are not set correctly. Until this is fixed in what I
       # consider a more proper way, we'll hack around this by passing
       # the binding as the optional arg parameter.
-      arg = 
-        if 'CFUNC' == tf.type && NilClass != klass 
-          klass 
+      arg =
+        if 'CFUNC' == tf.type && NilClass != klass
+          klass
         elsif 'raise' == event
           # As a horrible hack to be able to get the raise message on a
           # 'raise' event before the event occurs, I changed RubyVM to store
@@ -115,7 +116,7 @@ module Trace
 
       retval = @hook_proc.call(event, tf, arg)
       if retval.respond_to?(:ancestors) && retval.ancestors.include?(Exception)
-        raise retval 
+        raise retval
       end
     end
 
@@ -126,10 +127,10 @@ module Trace
         Kernel.set_trace_func(nil)
         return
       end
-      raise TypeError, 
-      "trace_func needs to be Proc or nil (is #{hook_proc.class})" unless 
+      raise TypeError,
+      "trace_func needs to be Proc or nil (is #{hook_proc.class})" unless
         hook_proc.is_a?(Proc)
-      raise TypeError, "arity of hook_proc should be 2 or -3 (is #{hook_proc.arity})" unless 
+      raise TypeError, "arity of hook_proc should be 2 or -3 (is #{hook_proc.arity})" unless
         2 == hook_proc.arity || -3 == hook_proc.arity
       @hook_proc = hook_proc
       if event_mask
@@ -152,17 +153,19 @@ module Trace
         Kernel.set_trace_func(nil)
         return
       end
-      raise TypeError, 
-      "trace_func needs to be Proc or nil (is #{hook_proc.class})" unless 
+      raise TypeError,
+      "trace_func needs to be Proc or nil (is #{hook_proc.class})" unless
         hook_proc.is_a?(Proc)
-      raise TypeError, "arity of hook_proc should be 2 or -3 (is #{hook_proc.arity})" unless 
+      raise TypeError, "arity of hook_proc should be 2 or -3 (is #{hook_proc.arity})" unless
         2 == hook_proc.arity || -3 == hook_proc.arity
       @hook_proc = hook_proc
-      if event_mask
-        Trace::set_trace_func(method(:trace_hook).to_proc, event_mask)
-      else
+      # NOTE: in Ruby 2.x, TracePoint should be used and for that
+      # reason our extended set_trace_func is not implemented.
+      # if event_mask
+      #  Trace::set_trace_func(method(:trace_hook).to_proc, event_mask)
+      #else
         Kernel.set_trace_func(method(:trace_hook).to_proc)
-      end
+      # end
     end
   end
 end
@@ -212,17 +215,17 @@ if __FILE__ == $0
   markers       = '*' * 10
 
   [[false, 'out'], [true, '']].each do |arg, suffix|
-    setup 
+    setup
     puts "%s with%s ignore %s" % [markers, suffix, markers]
     trace_test(arg)
     @trace_filter.set_trace_func(nil)
     print_trace
   end
 
-  @line_nos.each_with_index do 
+  @line_nos.each_with_index do
     |line_no, i|
     if (@start_line..@end_line).member?(line_no)
-      puts "We should not have found a line number in #{@start_line}..#{@end_line}." 
+      puts "We should not have found a line number in #{@start_line}..#{@end_line}."
       puts "Got line number #{line_no} at index #{i}, event #{@events[i]}"
     end
   end
